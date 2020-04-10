@@ -4,16 +4,30 @@
 #include <vector>
 #include <map>
 
-// to do : 1. add interfaces 
+// to do : 1. add interfaces to depend on them 
+
+// for example resetMovement can be implemented outside as 
+
+/*  
+resetMovement(IResettable* engine, point from, point to)
+{ 
+	engine.resetMovement(from, to);
+}
+*/
+
+
+// usage sample
+//				engine.setMovement(from, to)
+//						.checkPattern(threeInSequence)
+//							.performMatchingAction(dropItems, resetMovement)
+
 
 struct PxPos;
 struct PxFieldPoint;
 class PxEngine;
 
 typedef std::vector<PxFieldPoint>(*Pattern_t)(std::map<PxPos, PxFieldPoint>, PxFieldPoint);
-
 typedef void(*ActOnSuccess_t)(PxEngine* engine, std::vector<PxFieldPoint>);
-
 typedef void(*ActOnFail_t)(PxEngine* engine, PxPos start, PxPos end);
 
 void resetMovement(PxEngine* engine, PxPos start, PxPos end);
@@ -46,7 +60,6 @@ public:
 
 private:
 	std::map<PxPos, PxFieldPoint> fieldPointMap;
-
 	std::vector<PxFieldPoint> fieldPoints;
 	std::vector<PxFieldPoint> matchPoints;
 
