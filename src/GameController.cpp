@@ -1,5 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include "GameController.hpp"
+
+#include "ConfigParser.h"
+
 #include <string>
 #include <vector>
 #include <random>
@@ -23,73 +26,9 @@ void GameController::startGame() {
     run();
 }
 
-// config module blueprint
-std::string resFolder = "C:/Users/Sergey/Documents/_cpp/playrix/DevTestGame-master/resources/";
-
-size_t tileSize = 87;
-size_t figureSize = 60;
-size_t rowCount = 5;
-size_t columnCount = 5;
-size_t startPosX = 100;
-size_t startPosY = 100;
 
 
-size_t getBgTileSize() { return tileSize; }
-size_t getPawnSize() { return figureSize; }
-size_t getRowCount() { return rowCount; }
-size_t getColumnCount() { return columnCount; }
-size_t getStartPosX() { return startPosX; }
-size_t getStartPosY() { return startPosY; }
 
-
-std::string bgTextureSrc1 = resFolder + "tile_1.png";
-std::string bgTextureSrc2 = resFolder + "tile_2.png";
-std::string bgPressedTextureSrc = resFolder + "tile_3.png";
-
-std::string pawnRedSrc = resFolder + "red.png";
-std::string pawnBlueSrc = resFolder + "blue.png";
-std::string pawnGreenSrc = resFolder + "green.png";
-std::string pawnVioletSrc = resFolder + "violet.png";
-
-std::vector<std::string> textureSrc = { bgTextureSrc1, bgTextureSrc2, bgPressedTextureSrc };
-
-enum class TileColor { NoColor, Red, Green, Blue, Violet };
-enum class BackgrowndType {Type1, Type2, FieldChecked};
-
-std::map<BackgrowndType, std::string> bgTileMap;
-
-void initConfig()
-{
-	bgTileMap.emplace(BackgrowndType::Type1, bgTextureSrc1);
-	bgTileMap.emplace(BackgrowndType::Type2, bgTextureSrc2);
-	bgTileMap.emplace(BackgrowndType::FieldChecked, bgPressedTextureSrc);
-}
-
-
-Texture getBackgrowndTexture(BackgrowndType bgType)
-{ 
-	Texture txt;
-
-	if(!txt.loadFromFile(bgTileMap[bgType]))
-		throw std::exception("[config error] cannot load texture from source: /src/" );
-
-	return txt;
-}
-
-//Texture getPawnTextureByColor(TileColor color)
-
-//Texture bgTexture1, bgTexture2, bgTexture3, greenFigure, redFigure, blueFigure, violetFigure;
-//
-//texture_1.loadFromFile(resFolder + "tile_1.png");
-//texture_2.loadFromFile(resFolder + "tile_2.png");
-//texture_3.loadFromFile(resFolder + "tile_3.png");
-//
-//greenFigure.loadFromFile(resFolder + "green.png");
-//blueFigure.loadFromFile(resFolder + "blue.png");
-//redFigure.loadFromFile(resFolder + "red.png");
-//violetFigure.loadFromFile(resFolder + "violet.png");
-
-// end of config
 
 struct Direction
 {
@@ -278,9 +217,9 @@ void GameController::run() {
 
 	initConfig();
 
-	texture_1 = getBackgrowndTexture(BackgrowndType::Type1);
-	texture_2 = getBackgrowndTexture(BackgrowndType::Type2);
-	texture_3 = getBackgrowndTexture(BackgrowndType::FieldChecked);
+	texture_1 = getBackgroundTexture(BackgroundType::Type1);
+	texture_2 = getBackgroundTexture(BackgroundType::Type2);
+	texture_3 = getBackgroundTexture(BackgroundType::FieldChecked);
 
 	greenFigure.loadFromFile(resFolder + "green.png");
 	blueFigure.loadFromFile(resFolder + "blue.png");
@@ -288,12 +227,12 @@ void GameController::run() {
 	violetFigure.loadFromFile(resFolder + "violet.png");
 
 
-	float tileSize   = 87;
-	float figureSize = 60;
-	int rowCount     = 5, 
-		columnCount  = 5;
-	float startPosX  = 100, 
-		  startPosY  = 100;
+	size_t tileSize   = getBgTileSize();
+	size_t figureSize = getPawnSize();
+	size_t rowCount = getRowCount();
+	size_t columnCount  = getColumnCount();
+	size_t startPosX = getStartPosX();
+	size_t startPosY  = getStartPosY();
 
 	std::vector<Sprite> tiles;
 
