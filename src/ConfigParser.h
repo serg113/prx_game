@@ -3,11 +3,20 @@
 #include <SFML/Graphics.hpp>
 
 
-enum class TileColor { NoColor, Red, Green, Blue, Violet };
-enum class BackgroundType { Type1, Type2, FieldChecked };
+enum class TileType {
+	NoType,
+	BackGroundType1, 
+	BackGroundType2, 
+	BackGroundType3,
+	RedPawn, 
+	GreenPawn, 
+	BluePawn, 
+	VioletPawn
+};
 
 void initConfig();
 
+size_t getPownCount();
 size_t getBgTileSize();
 size_t getPawnSize();
 size_t getRowCount();
@@ -16,6 +25,6 @@ size_t getStartPosX();
 size_t getStartPosY();
 
 
-sf::Texture getBackgroundTexture(BackgroundType bgType);
+sf::Texture getTexture(TileType tType);
 
 
