@@ -1,37 +1,35 @@
 #include "PxEngine.h"
 
 #include <exception>
+#include <iostream>
 
-
-PxEngine* PxEngine::setMovement(PxPos start, PxPos end)
+void PxEngine::setMovement(PxPos start, PxPos end)
 {
-	exchEnd = end;
+	secondPos = end;
 
-	exchStart = start;
+	firstPos = start;
 
 	std::swap(fieldPointMap[start].pawn, fieldPointMap[end].pawn);
-
-	return this;
 }
 
-PxEngine* PxEngine::checkPattern(Pattern_t pattern)
+void PxEngine::checkPattern(PatternCB_t pattern)
 {
-	for (auto exPoint : { exchStart, exchEnd })
+	for (auto exPoint : { firstPos, secondPos })
 		for (auto matchPoint : pattern(fieldPointMap, fieldPointMap[exPoint]))
 			matchPoints.push_back(matchPoint);
-
-	return this;
 }
 
-PxEngine* PxEngine::performMatchingAction(ActOnSuccess_t matchingAction, ActOnFail_t failureAction)
+void PxEngine::performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
 {
 	if (matchPoints.empty())
 		failureAction(this);
 	else
 		matchingAction(this, fieldPoints);
+
 }
 
-std::vector<PxFieldPoint> PxEngine::getPatternMatchPoints(Pattern_t pattern) const
+
+std::vector<PxFieldPoint> PxEngine::getPatternMatchPoints(PatternCB_t pattern) const
 {
 	return this->matchPoints;
 }
@@ -48,22 +46,24 @@ std::map<PxPos, PxFieldPoint> PxEngine::getFieldPointMap() const
 
 void PxEngine::resetMovement()
 {
-	std::swap(fieldPointMap[this->exchStart].pawn, fieldPointMap[this->exchStart].pawn);
+	std::swap(fieldPointMap[this->firstPos].pawn, fieldPointMap[this->secondPos].pawn);
 }
 
 void PxEngine::matchThreeInSequenceDirectionX()
 { 
 	throw std::exception("[not implemented] matchThreeInSequenceDirectionX()");
 }
+
 void PxEngine::matchThreeInSequenceDirectoryY()
 {
 	throw std::exception("[not implemented] matchThreeInSequenceDirectionY()");
 }
+
 void PxEngine::matchFourInSquare()
 {
 	throw std::exception("[not implemented] matchFourInSquare()");
-
 }
+
 void PxEngine::matchTypeT()
 {
 	throw std::exception("[not implemented] matchTypeT()");
@@ -71,12 +71,6 @@ void PxEngine::matchTypeT()
 
 
 // free functions
-
-void resetLastMovement(IResettableEngine* engine)
-{
-	engine->resetMovement();
-}
-
 
 void PxDraw(PxEngine* engine, sf::RenderWindow* app)
 {

@@ -1,5 +1,11 @@
 #pragma once
 
+// need to be renemed to EngineBase.h
+
+class PxEngineBase
+{
+	virtual ~PxEngineBase() = default;
+};
 
 class IResettableEngine
 {
@@ -15,3 +21,10 @@ public:
 	virtual void matchFourInSquare() = 0;
 	virtual void matchTypeT() = 0;
 };
+
+struct PxPos;
+struct PxFieldPoint;
+
+typedef std::vector<PxFieldPoint>(*PatternCB_t)(std::map<PxPos, PxFieldPoint>, PxFieldPoint);
+typedef void(*ActOnSuccessCB_t)(IPatternMatchable2D* engine, std::vector<PxFieldPoint>);
+typedef void(*ActOnFailCB_t)(IResettableEngine* engine);

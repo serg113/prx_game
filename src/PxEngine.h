@@ -7,7 +7,6 @@
 #include <map>
 
 
-
 // note: pattern can be described by interfaces, 
 //		 for accepting some pattern behavior, 
 //       engine class need to implement appropriate interface
@@ -19,17 +18,8 @@
 //				.checkPattern(threeInSequence)
 //					.performMatchingAction(dropItems, resetMovement)
 
-
-
-struct PxPos;
-struct PxFieldPoint;
 class PxEngine;
 
-typedef std::vector<PxFieldPoint>(*Pattern_t)(std::map<PxPos, PxFieldPoint>, PxFieldPoint);
-typedef void(*ActOnSuccess_t)(PxEngine* engine, std::vector<PxFieldPoint>);
-typedef void(*ActOnFail_t)(IResettableEngine* engine);
-
-void resetLastMovement(IResettableEngine* engine);
 void PxDraw(PxEngine* engine, sf::RenderWindow* app);
 
 struct PxPos
@@ -45,32 +35,36 @@ struct PxFieldPoint
 	sf::Sprite* pawn;
 };
 
-class PxEngine : public IResettableEngine, public IPatternMatchable2D
+
+class PxEngine : public PxEngineBase, public IResettableEngine, public IPatternMatchable2D
 {
 public:
-	PxEngine* setMovement(PxPos start, PxPos end);
-	PxEngine* checkPattern(Pattern_t pattern);
-	PxEngine* performMatchingAction(ActOnSuccess_t matchingAction, ActOnFail_t failureAction = resetLastMovement);
-
-
-	std::vector<PxFieldPoint> getPatternMatchPoints(Pattern_t pattern) const;
-	std::map<PxPos, PxFieldPoint> getFieldPointMap() const;
-	std::vector<PxFieldPoint> getFieldPoints() const;
-
 	virtual void resetMovement() override;
 	virtual void matchThreeInSequenceDirectionX() override;
 	virtual void matchThreeInSequenceDirectoryY() override;
 	virtual void matchFourInSquare() override;
 	virtual void matchTypeT() override;
 
+
+	void setMovement(PxPos firstPos, PxPos secondPos);
+	void checkPattern(PatternCB_t pattern);
+	void performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction);
+
+	std::vector<PxFieldPoint> getPatternMatchPoints(PatternCB_t pattern) const;
+	std::map<PxPos, PxFieldPoint> getFieldPointMap() const;
+	std::vector<PxFieldPoint> getFieldPoints() const;
+
 private:
 	std::map<PxPos, PxFieldPoint> fieldPointMap;
 	std::vector<PxFieldPoint> fieldPoints;
 	std::vector<PxFieldPoint> matchPoints;
 
-	PxPos exchStart;
-	PxPos exchEnd;
+	PxPos firstPos;
+	PxPos secondPos;
 };
+
+
+
 
 
 
