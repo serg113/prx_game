@@ -2,14 +2,43 @@
 
 #include <exception>
 #include <iostream>
+#include <cmath>
 
-void PxEngine::setMovement(PxPos start, PxPos end)
+
+
+PxEngine::PxEngine() {};
+
+void PxEngine::enableMovementDirections(Movement2D dir)
 {
-	secondPos = end;
+	switch (dir)
+	{
+	case Movement2D::DX: move2d.isDxEnabled = true;
+	case Movement2D::DY: move2d.isDyEnabled = true;
+	case Movement2D::DXY: move2d.isDxyEnabled = true;
+	}
+}
 
-	firstPos = start;
+void PxEngine::setFieldPointMap(const std::map<PxPos, PxFieldPoint>  fPoints)
+{
+	fieldPointMap = fPoints;
+}
 
-	std::swap(fieldPointMap[start].pawn, fieldPointMap[end].pawn);
+void PxEngine::setMovement(const PxPos p1, const PxPos p2)
+{
+	if (!isMovementPossible(p1, p2))
+		return;
+
+	firstPos = p1;
+	secondPos = p2;
+
+	swapTextures(fieldPointMap[p1].pawn, fieldPointMap[p2].pawn);
+}
+
+void PxEngine::swapTextures(sf::Sprite* lhs, sf::Sprite* rhs)
+{
+	const sf::Texture* temp = lhs->getTexture();
+	lhs->setTexture(*(rhs->getTexture()), true);
+	rhs->setTexture(*temp, true);
 }
 
 void PxEngine::checkPattern(PatternCB_t pattern)
@@ -24,8 +53,7 @@ void PxEngine::performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailC
 	if (matchPoints.empty())
 		failureAction(this);
 	else
-		matchingAction(this, fieldPoints);
-
+		matchingAction(this);
 }
 
 
@@ -34,14 +62,9 @@ std::vector<PxFieldPoint> PxEngine::getPatternMatchPoints(PatternCB_t pattern) c
 	return this->matchPoints;
 }
 
-std::vector<PxFieldPoint> PxEngine::getFieldPoints() const
-{
-	return this->fieldPoints;
-}
-
 std::map<PxPos, PxFieldPoint> PxEngine::getFieldPointMap() const
 {
-	return this->getFieldPointMap;
+	return this->fieldPointMap;
 }
 
 void PxEngine::resetMovement()
@@ -69,17 +92,22 @@ void PxEngine::matchTypeT()
 	throw std::exception("[not implemented] matchTypeT()");
 }
 
-
-// free functions
-
-void PxDraw(PxEngine* engine, sf::RenderWindow* app)
+void PxEngine::drawMap(sf::RenderWindow* app)
 {
-	auto fPoints = engine->getFieldPoints();
-
-	for (auto point : fPoints)
+	for (auto point : fieldPointMap)
 	{
-		app->draw(*(point.bgTile));
-		app->draw(*(point.pawn));
+		app->draw(*(point.second.bgTile));
+		app->draw(*(point.second.pawn));
 	}
-
 };
+
+bool PxEngine::isMovementPossible(const PxPos p1, const PxPos p2)
+{
+	if ((p1.X < 0 || p2.X < 0) || (p1.Y < 0 || p2.Y < 0))
+		return false;
+
+	if ((abs((int)(p1.X - p2.X)) + abs((int)(p1.Y - p2.Y))) == 1)
+		return true;
+
+	return false;
+}

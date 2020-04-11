@@ -1,5 +1,4 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 
 #include "PatternsBase.h"
 
@@ -7,61 +6,47 @@
 #include <map>
 
 
-// note: pattern can be described by interfaces, 
-//		 for accepting some pattern behavior, 
-//       engine class need to implement appropriate interface
-
-
-// usage sample
-
-//		engine.setMovement(from, to)
-//				.checkPattern(threeInSequence)
-//					.performMatchingAction(dropItems, resetMovement)
-
-class PxEngine;
-
-void PxDraw(PxEngine* engine, sf::RenderWindow* app);
-
-struct PxPos
-{
-	size_t X = 0;
-	size_t Y = 0;
-};
-
-struct PxFieldPoint 
-{
-	PxPos pos;
-	sf::Sprite* bgTile;
-	sf::Sprite* pawn;
-};
-
-
 class PxEngine : public PxEngineBase, public IResettableEngine, public IPatternMatchable2D
 {
 public:
+	PxEngine();
 	virtual void resetMovement() override;
 	virtual void matchThreeInSequenceDirectionX() override;
 	virtual void matchThreeInSequenceDirectoryY() override;
 	virtual void matchFourInSquare() override;
 	virtual void matchTypeT() override;
 
-
-	void setMovement(PxPos firstPos, PxPos secondPos);
+	void enableMovementDirections(Movement2D dir);
+	void setFieldPointMap(const std::map<PxPos, PxFieldPoint> fieldPointMap);
+	void setMovement(const PxPos firstPos, const PxPos secondPos);
 	void checkPattern(PatternCB_t pattern);
 	void performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction);
 
 	std::vector<PxFieldPoint> getPatternMatchPoints(PatternCB_t pattern) const;
 	std::map<PxPos, PxFieldPoint> getFieldPointMap() const;
-	std::vector<PxFieldPoint> getFieldPoints() const;
+
+	void drawMap(sf::RenderWindow* app);
+	void swapTextures(sf::Sprite*, sf::Sprite*);
 
 private:
+	bool isMovementPossible(const PxPos p1, const PxPos p2);
+
+
 	std::map<PxPos, PxFieldPoint> fieldPointMap;
-	std::vector<PxFieldPoint> fieldPoints;
 	std::vector<PxFieldPoint> matchPoints;
 
 	PxPos firstPos;
 	PxPos secondPos;
+
+	struct Move2D
+	{
+		bool isDxEnabled = false;
+		bool isDyEnabled = false;
+		bool isDxyEnabled = false;
+	} move2d;
 };
+
+
 
 
 
