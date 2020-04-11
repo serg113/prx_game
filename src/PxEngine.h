@@ -1,25 +1,24 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+#include "PatternsBase.h"
+
 #include <vector>
 #include <map>
 
-// to do : 1. add interfaces to depend on them 
 
-// for example resetMovement can be implemented outside as 
 
-/*  
-resetMovement(IResettable* engine, point from, point to)
-{ 
-	engine.resetMovement(from, to);
-}
-*/
+// note: pattern can be described by interfaces, 
+//		 for accepting some pattern behavior, 
+//       engine class need to implement appropriate interface
 
 
 // usage sample
-//				engine.setMovement(from, to)
-//						.checkPattern(threeInSequence)
-//							.performMatchingAction(dropItems, resetMovement)
+
+//		engine.setMovement(from, to)
+//				.checkPattern(threeInSequence)
+//					.performMatchingAction(dropItems, resetMovement)
+
 
 
 struct PxPos;
@@ -28,9 +27,9 @@ class PxEngine;
 
 typedef std::vector<PxFieldPoint>(*Pattern_t)(std::map<PxPos, PxFieldPoint>, PxFieldPoint);
 typedef void(*ActOnSuccess_t)(PxEngine* engine, std::vector<PxFieldPoint>);
-typedef void(*ActOnFail_t)(PxEngine* engine, PxPos start, PxPos end);
+typedef void(*ActOnFail_t)(IResettableEngine* engine);
 
-void resetMovement(PxEngine* engine, PxPos start, PxPos end);
+void resetLastMovement(IResettableEngine* engine);
 void PxDraw(PxEngine* engine, sf::RenderWindow* app);
 
 struct PxPos
@@ -46,17 +45,23 @@ struct PxFieldPoint
 	sf::Sprite* pawn;
 };
 
-class PxEngine
+class PxEngine : public IResettableEngine, public IPatternMatchable2D
 {
 public:
 	PxEngine* setMovement(PxPos start, PxPos end);
 	PxEngine* checkPattern(Pattern_t pattern);
-	PxEngine* performMatchingAction(ActOnSuccess_t matchingAction, ActOnFail_t failureAction = resetMovement);
+	PxEngine* performMatchingAction(ActOnSuccess_t matchingAction, ActOnFail_t failureAction = resetLastMovement);
 
 
 	std::vector<PxFieldPoint> getPatternMatchPoints(Pattern_t pattern) const;
 	std::map<PxPos, PxFieldPoint> getFieldPointMap() const;
 	std::vector<PxFieldPoint> getFieldPoints() const;
+
+	virtual void resetMovement() override;
+	virtual void matchThreeInSequenceDirectionX() override;
+	virtual void matchThreeInSequenceDirectoryY() override;
+	virtual void matchFourInSquare() override;
+	virtual void matchTypeT() override;
 
 private:
 	std::map<PxPos, PxFieldPoint> fieldPointMap;

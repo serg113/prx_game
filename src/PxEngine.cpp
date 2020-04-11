@@ -1,5 +1,7 @@
 #include "PxEngine.h"
 
+#include <exception>
+
 
 PxEngine* PxEngine::setMovement(PxPos start, PxPos end)
 {
@@ -24,7 +26,7 @@ PxEngine* PxEngine::checkPattern(Pattern_t pattern)
 PxEngine* PxEngine::performMatchingAction(ActOnSuccess_t matchingAction, ActOnFail_t failureAction)
 {
 	if (matchPoints.empty())
-		failureAction(this, exchStart, exchEnd);
+		failureAction(this);
 	else
 		matchingAction(this, fieldPoints);
 }
@@ -44,11 +46,35 @@ std::map<PxPos, PxFieldPoint> PxEngine::getFieldPointMap() const
 	return this->getFieldPointMap;
 }
 
-void resetMovement(PxEngine* engine, PxPos start, PxPos end)
+void PxEngine::resetMovement()
 {
-	auto fieldPointMap = engine->getFieldPointMap();
+	std::swap(fieldPointMap[this->exchStart].pawn, fieldPointMap[this->exchStart].pawn);
+}
 
-	std::swap(fieldPointMap[end].pawn, fieldPointMap[start].pawn);
+void PxEngine::matchThreeInSequenceDirectionX()
+{ 
+	throw std::exception("[not implemented] matchThreeInSequenceDirectionX()");
+}
+void PxEngine::matchThreeInSequenceDirectoryY()
+{
+	throw std::exception("[not implemented] matchThreeInSequenceDirectionY()");
+}
+void PxEngine::matchFourInSquare()
+{
+	throw std::exception("[not implemented] matchFourInSquare()");
+
+}
+void PxEngine::matchTypeT()
+{
+	throw std::exception("[not implemented] matchTypeT()");
+}
+
+
+// free functions
+
+void resetLastMovement(IResettableEngine* engine)
+{
+	engine->resetMovement();
 }
 
 
