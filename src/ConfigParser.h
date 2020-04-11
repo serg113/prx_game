@@ -16,7 +16,7 @@ enum class TileType {
 
 void initConfig();
 
-size_t getPownCount();
+size_t getPawnCount();
 size_t getBgTileSize();
 size_t getPawnSize();
 size_t getRowCount();

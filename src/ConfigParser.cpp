@@ -25,7 +25,7 @@ std::string pawnVioletSrc = resFolder + "violet.png";
 
 std::map<TileType, std::string> tileImgSrc;
 
-size_t getPownCount() { return pawnCount; }
+size_t getPawnCount() { return pawnCount; }
 size_t getBgTileSize() { return tileSize; }
 size_t getPawnSize() { return figureSize; }
 size_t getRowCount() { return rowCount; }
