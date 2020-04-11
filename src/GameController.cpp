@@ -92,16 +92,15 @@ void GameController::run() {
 
 			tile->setPosition(startPosX + tileSize * i, startPosY + tileSize * j);
 
-			fieldPointsMap.emplace(PxPos(i, j), PxFieldPoint(tile, nullptr));
-
 			// foreground initialization part
 			unsigned int pawnColorIndex = rd() % getPawnCount();
 
 			Sprite* pawn = new Sprite(pawnTextures[pawnColorIndex]);
 
 			pawn->setPosition(startPosX + tileSize * i + offset/2, startPosY + tileSize * j + offset/2);
+
 			
-			fieldPointsMap[PxPos(i, j)].pawn = pawn;
+			fieldPointsMap.emplace(PxPos(i, j), PxFieldPoint(tile, pawn));
 		}
 	}
 	
@@ -119,8 +118,6 @@ void GameController::run() {
 
 		engine.draw(_app);
 		
-		
-
         sf::Event event;
         while (_app->pollEvent(event)) {
             // "close requested" event: we close the window
@@ -133,78 +130,21 @@ void GameController::run() {
 
 				if (isPrevPosValid)
 				{
-					engine.setMovement(prevPosition, PxPos(x, y));
-					engine.draw(_app);
+					engine.setMovement(prevPosition, PxPos(x, y))->resetDifferedBackground(prevPosition);
+
 					isPrevPosValid = false;
 				}
 				else
 				{
 					prevPosition = PxPos(x, y);
+
+					engine.setDifferedBackground(prevPosition, &bgTxt3);
+					
 					isPrevPosValid = true;
+
 				}
 			}
-			/*
-			if (event.type == sf::Event::MouseButtonReleased)
-			{
-				std::cout << "mouse x: " << event.mouseButton.x << std::endl;
-				std::cout << "mouse y: " << event.mouseButton.y << std::endl;
-
-				int row = static_cast<int>((event.mouseButton.x - startPosX) / tileSize);
-				int column = static_cast<int>((event.mouseButton.y - startPosY) / tileSize);
-				
-				int tileIndex = row * columnCount + column;
-				std::cout << "index = " << tileIndex << std::endl;
-
-				if (!prevSelection.is_valid)
-				{
-					prevSelection.index = tileIndex;
-					prevSelection.is_valid = true;
-					prevSelection.texture = tiles[tileIndex]->getTexture();
-					prevSelection.row = row;
-					prevSelection.col = column;
-
-					tiles[tileIndex]->setTexture(bgTxt3);
-					_app->draw(*tiles[tileIndex]);
-				}
-				else 
-				{
-					if (pawns[prevSelection.index]->tColor != pawns[tileIndex]->tColor)
-					{
-						// also check if adjoints
-
-						if (checkMatching(pawns[tileIndex], pawns[prevSelection.index], pawns[tileIndex]->tColor)
-							|| checkMatching(pawns[prevSelection.index], pawns[tileIndex], pawns[prevSelection.index]->tColor))
-						{
-							std::cout << "can be exchanged" << std::endl;
-							const Texture* temp = pawns[tileIndex]->tile.getTexture();
-							pawns[tileIndex]->tile.setTexture(*(pawns[prevSelection.index]->tile.getTexture()), true);
-							pawns[prevSelection.index]->tile.setTexture(*temp, true);
-
-							_app->draw(pawns[tileIndex]->tile);
-							_app->draw(pawns[prevSelection.index]->tile);
-
-						}
-						else
-						{
-							//const Texture* temp = figTiles[tileIndex]->tile.getTexture();
-							//figTiles[tileIndex]->tile.setTexture(*(figTiles[prevSelection.index]->tile.getTexture()), true);
-							//figTiles[prevSelection.index]->tile.setTexture(*temp, true);
-						}
-					}
-
-					tiles[prevSelection.index]->setTexture(*(prevSelection.texture));
-					_app->draw(*tiles[prevSelection.index]);
-					prevSelection.is_valid = false;
-
-
-				}
-
-				
-
-				//figTiles.erase(tiles.begin() + tileIndex);
-				setAdjoints(pawns);
-			}
-			*/
+			
         }
         _app->display();
     }

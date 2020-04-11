@@ -41,6 +41,7 @@ struct PxFieldPoint
 	PxFieldPoint() = default;
 	PxFieldPoint(sf::Sprite* back, sf::Sprite* front);
 	sf::Sprite* bgTile;
+	const sf::Texture* bgTxt;
 	sf::Sprite* pawn;
 };
 

@@ -8,6 +8,8 @@ class PxEngineFacade
 {
 public:
 	PxEngineFacade();
+	PxEngineFacade* setDifferedBackground(PxPos position, sf::Texture* txt);
+	PxEngineFacade* resetDifferedBackground(PxPos position);
 	PxEngineFacade* enableMovement(Movement2D dir);
 	PxEngineFacade* draw(sf::RenderWindow* app);
 	PxEngineFacade* setGameMap(std::map<PxPos, PxFieldPoint> fieldPointMap);

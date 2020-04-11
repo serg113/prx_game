@@ -8,6 +8,20 @@
 
 PxEngine::PxEngine() {};
 
+
+void PxEngine::setDifferedBackground(PxPos position, sf::Texture* txt)
+{
+	fieldPointMap[position].bgTxt = fieldPointMap[position].bgTile->getTexture();
+
+	fieldPointMap[position].bgTile->setTexture(*txt);
+}
+
+void PxEngine::resetDifferedBackground(PxPos position)
+{
+	fieldPointMap[position].bgTile->setTexture(*fieldPointMap[position].bgTxt);
+}
+
+
 void PxEngine::enableMovementDirections(Movement2D dir)
 {
 	switch (dir)

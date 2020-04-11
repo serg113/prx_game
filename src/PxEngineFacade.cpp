@@ -9,6 +9,20 @@ PxEngineFacade::PxEngineFacade()
 	engine = new PxEngine();
 }
 
+PxEngineFacade* PxEngineFacade::setDifferedBackground(PxPos position, sf::Texture* txt)
+{
+	dynamic_cast<PxEngine*>(engine)->setDifferedBackground(position, txt);
+
+	return this;
+}
+
+PxEngineFacade* PxEngineFacade::resetDifferedBackground(PxPos position)
+{
+	dynamic_cast<PxEngine*>(engine)->resetDifferedBackground(position);
+
+	return this;
+}
+
 PxEngineFacade* PxEngineFacade::enableMovement(Movement2D dir)
 {
 	dynamic_cast<PxEngine*>(engine)->enableMovementDirections(dir);

@@ -16,6 +16,9 @@ public:
 	virtual void matchFourInSquare() override;
 	virtual void matchTypeT() override;
 
+	void setDifferedBackground(PxPos position, sf::Texture* txt);
+	void resetDifferedBackground(PxPos position);
+
 	void enableMovementDirections(Movement2D dir);
 	void setFieldPointMap(const std::map<PxPos, PxFieldPoint> fieldPointMap);
 	void setMovement(const PxPos firstPos, const PxPos secondPos);
