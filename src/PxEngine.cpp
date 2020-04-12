@@ -73,31 +73,6 @@ void PxEngine::matchAllPatterns()
 	}
 }
 
-
-void PxEngine::addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
-{
-	patterns.push_back({ pattern, matchingAction, failureAction });
-}
-
-void PxEngine::checkPatterns()
-{
-	std::vector<PxPos> points;
-	for (auto patt_cb : patterns)
-	{
-		auto fPoints = patt_cb.pattern(fieldPointMap, firstPos);
-		points.insert(points.end(), fPoints.begin(), fPoints.end());
-
-		auto sPoints = patt_cb.pattern(fieldPointMap, secondPos);
-		points.insert(points.end(), sPoints.begin(), sPoints.end());
-	
-		if (points.size() > 0)
-			patt_cb.matchingAction(fieldPointMap, points);
-		else
-			resetMovement(firstPos, secondPos);
-	}
-}
-
-
 void PxEngine::setDifferedBackground(PxPos position, sf::Texture* txt)
 {
 	fieldPointMap[position].bgTxt = fieldPointMap[position].bgTile->getTexture();

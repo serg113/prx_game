@@ -11,47 +11,33 @@ class PxEngine : public PxEngineBase
 {
 public:
 	PxEngine();
-
+	// initialization of engine
 	void setConfigs(Config params);
 	void addPatternToMatch(PxPatternBase* pattern);
-	void initGameMap();// after this step, initialization ends, and board map ready to play 
+	void initGameMap();
+	// after this step, initialization ends, and board map ready to play 
 
-	void matchAllPatterns();
-
+	// engine basic functionality
 	void swapPawns(const PxPos firstPos, const PxPos secondPos);
+	void matchAllPatterns();
 	void setDifferedBackground(PxPos position, sf::Texture* txt);
 	void resetDifferedBackground(PxPos position);
 
+	// draw ui
 	void drawMap(sf::RenderWindow* app);
-	void swapTextures(sf::Sprite*, sf::Sprite*);
-
-	// callback patterns functionality, will be deleted at next iteration
-	void addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = nullptr);
-	void checkPatterns();
-
-	void dropDownPawns(PxPos position);
 
 private:
+	void swapTextures(sf::Sprite*, sf::Sprite*);
+	void dropDownPawns(PxPos position);
 	void resetMovement(PxPos prev, PxPos curr);
 	bool isMovementPossible(const PxPos p1, const PxPos p2);
 
-	std::map<PxPos, PxFieldPoint> fieldPointMap;
-	std::vector<PxPos> matchPoints;
-	std::vector<const PxPatternBase*> pxPatterns;
 
+	Config params;
 	PxPos firstPos;
 	PxPos secondPos;
 
-	Config params;
-
-	// currently useless and may be deleted at next iteration
-	struct PatternCB
-	{
-		PatternCB_t pattern;
-		ActOnSuccessCB_t matchingAction;
-		ActOnFailCB_t failureAction;
-	};
-
-	std::vector<PatternCB> patterns;
+	std::map<PxPos, PxFieldPoint> fieldPointMap;
+	std::vector<const PxPatternBase*> pxPatterns;
 
 };

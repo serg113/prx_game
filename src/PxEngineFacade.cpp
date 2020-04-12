@@ -52,20 +52,6 @@ PxEngineFacade* PxEngineFacade::swapPawns(PxPos firstPos, PxPos secondPos)
 	return this;
 }
 
-PxEngineFacade* PxEngineFacade::checkPatterns()
-{
-	dynamic_cast<PxEngine*>(engine)->checkPatterns();
-	
-	return this;
-}
-
-
-PxEngineFacade* PxEngineFacade::addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
-{
-	dynamic_cast<PxEngine*>(engine)->addPatternToMatch(pattern, matchingAction, failureAction);
-
-	return this;
-}
 
 PxEngineFacade* PxEngineFacade::addPatternToMatch(PxPatternBase* pattern)
 {
