@@ -66,3 +66,17 @@ PxEngineFacade* PxEngineFacade::addPatternToMatch(PatternCB_t pattern, ActOnSucc
 	return this;
 }
 
+PxEngineFacade* PxEngineFacade::addPatternToMatch(PxPatternBase* pattern)
+{
+	dynamic_cast<PxEngine*>(engine)->addPatternToMatch(pattern);
+
+	return this;
+}
+
+PxEngineFacade* PxEngineFacade::matchAllPatterns()
+{
+	dynamic_cast<PxEngine*>(engine)->matchAllPatterns();
+
+	return this;
+}
+

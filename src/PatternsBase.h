@@ -4,35 +4,13 @@
 
 #include <map>
 #include <vector>
+#include <set>
 
 
 class PxEngineBase
 {
 public:
 	virtual ~PxEngineBase() = default;
-};
-
-class PxPos;
-
-class PatternFailureInterface
-{
-public:
-	virtual void resetMovement(PxPos prev, PxPos curr) = 0;
-};
-
-class PatternSuccessInterface
-{
-public:
-	virtual void deleteMatchingPoints(std::vector<PxPos> points) = 0;
-};
-
-class IPatternMatchable2D
-{
-public:
-	virtual std::vector<PxPos> matchThreeInSequenceDirectionX() = 0;
-	virtual std::vector<PxPos> matchThreeInSequenceDirectoryY() = 0;
-	virtual std::vector<PxPos> matchFourInSquare() = 0;
-	virtual std::vector<PxPos> matchTypeT() = 0;
 };
 
 class PxPos 
@@ -56,14 +34,41 @@ struct PxFieldPoint
 
 enum class Movement2D {DX, DY, DXY};
 
+// pattern base
+class PxPatternBase
+{
+public:
+	virtual std::set<PxPos> match(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const = 0;
+	virtual void actOnSuccess(std::map<PxPos, PxFieldPoint>& fieldMap, std::set<PxPos>& points) const = 0;
+	virtual void actOnFailure(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const = 0;
+};
+
+// concrete implementation of pattern base
+class MatchThreeInDirectionXY : public PxPatternBase
+{
+public:
+	virtual std::set<PxPos> match(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const override;
+	virtual void actOnSuccess(std::map<PxPos, PxFieldPoint>& fieldMap, std::set<PxPos>& points) const override;
+	virtual void actOnFailure(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const override;
+
+};
+
+// callback implementation case
 typedef std::vector<PxPos>(*PatternCB_t)(std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos);
 typedef void(*ActOnSuccessCB_t)(std::map<PxPos, PxFieldPoint>&, std::vector<PxPos>);
 typedef void(*ActOnFailCB_t)(PxPos prev, PxPos curr);
 
-
+std::vector<PxPos> matchThreeInSequenceDirectionXY(std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos position);
 std::vector<PxPos> matchThreeInSequenceDirectionX(std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos position);
+std::vector<PxPos> matchThreeInSequenceDirectionY(std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos position);
 
 void deleteMatchingPoints(std::map<PxPos, PxFieldPoint>& fieldPointMap, std::vector<PxPos> matchPoints);
 
-
-
+class IPatternMatchable2D
+{
+public:
+	virtual std::vector<PxPos> matchThreeInSequenceDirectionX() = 0;
+	virtual std::vector<PxPos> matchThreeInSequenceDirectoryY() = 0;
+	virtual std::vector<PxPos> matchFourInSquare() = 0;
+	virtual std::vector<PxPos> matchTypeT() = 0;
+};

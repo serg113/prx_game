@@ -4,20 +4,25 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
 
-class PxEngine : public PxEngineBase, public PatternFailureInterface
+class PxEngine : public PxEngineBase
 {
 public:
 	PxEngine();
 	
-	virtual void resetMovement(PxPos prev, PxPos curr) override;
-
-	void setFieldPointMap(const std::map<PxPos, PxFieldPoint> fieldPointMap);
+	void setFieldPointMap(const std::map<PxPos, PxFieldPoint>& fieldPointMap);
 	void enableMovementDirections(Movement2D dir);
-	void addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = nullptr);
 
+	// virtual base pattern functionality
+	void addPatternToMatch(PxPatternBase* pattern);
+	void matchAllPatterns();
+
+	// callback patterns functionality
+	void addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = nullptr);
 	void checkPatterns();
+
 	void setMovement(const PxPos firstPos, const PxPos secondPos);
 	void setDifferedBackground(PxPos position, sf::Texture* txt);
 	void resetDifferedBackground(PxPos position);
@@ -30,11 +35,16 @@ public:
 	void swapTextures(sf::Sprite*, sf::Sprite*);
 
 private:
+	void resetMovement(PxPos prev, PxPos curr);
 	bool isMovementPossible(const PxPos p1, const PxPos p2);
-
 
 	std::map<PxPos, PxFieldPoint> fieldPointMap;
 	std::vector<PxPos> matchPoints;
+	std::vector<const PxPatternBase*> pxPatterns;
+
+	PxPos firstPos;
+	PxPos secondPos;
+
 
 	struct PatternCB
 	{
@@ -45,9 +55,6 @@ private:
 
 	std::vector<PatternCB> patterns;
 
-	PxPos firstPos;
-	PxPos secondPos;
-
 	struct Move2D
 	{
 		bool isDxEnabled = false;
@@ -55,43 +62,3 @@ private:
 		bool isDxyEnabled = false;
 	} move2d;
 };
-
-
-
-
-
-
-
-
-
-/*
-	pattern
-	1. check if 3 horizontal elements equality comparer gives true
-	the elements compose sequence that includes provided one
-
-	comparator -- bool(*fn)(Pawn, Pawn), [](Pawn a, Pawn b){return a.color == b.color;}
-				  is based on pawn color, can be lambda expression
-
-
-	list<Pawn> pawns;
-
-	std::vector<Movable2D> processPattrernName(Movable2D pawn, comparator cmp)
-	{
-		std::vector<Movable2D> retValue;
-
-		if(cmp(pawn.x, itX + 1)
-		{
-			if(cmp(itX, itX + 2)
-				return (x, x+1, x+2);
-			if(cmp(itX, itX - 1)
-				return (x-1, x, x+1);
-		}
-
-		if(cmp(itX, itX - 1) && cmp(itX, itX - 2))
-			return (x-2, x-1, x);
-
-		return ();
-
-	}
-
-*/

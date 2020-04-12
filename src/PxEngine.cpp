@@ -9,6 +9,25 @@
 PxEngine::PxEngine() {};
 
 
+void PxEngine::addPatternToMatch(PxPatternBase* pattern)
+{
+	pxPatterns.push_back(pattern);
+}
+
+void PxEngine::matchAllPatterns()
+{
+	for (auto pxPat : pxPatterns)
+	{
+		auto points = pxPat->match(fieldPointMap, firstPos, secondPos);
+
+		if (points.size())
+			pxPat->actOnSuccess(fieldPointMap, points);
+		else
+			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos);
+	}
+}
+
+
 void PxEngine::addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
 {
 	patterns.push_back({ pattern, matchingAction, failureAction });
@@ -16,20 +35,20 @@ void PxEngine::addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingA
 
 void PxEngine::checkPatterns()
 {
+	std::vector<PxPos> points;
 	for (auto patt_cb : patterns)
 	{
-		auto points = patt_cb.pattern(fieldPointMap, firstPos);
+		auto fPoints = patt_cb.pattern(fieldPointMap, firstPos);
+		points.insert(points.end(), fPoints.begin(), fPoints.end());
 
 		auto sPoints = patt_cb.pattern(fieldPointMap, secondPos);
-
 		points.insert(points.end(), sPoints.begin(), sPoints.end());
-		
+	
 		if (points.size() > 0)
 			patt_cb.matchingAction(fieldPointMap, points);
 		else
 			resetMovement(firstPos, secondPos);
 	}
-	
 }
 
 
@@ -56,7 +75,7 @@ void PxEngine::enableMovementDirections(Movement2D dir) // not implemented
 	}
 }
 
-void PxEngine::setFieldPointMap(const std::map<PxPos, PxFieldPoint>  fPoints)
+void PxEngine::setFieldPointMap(const std::map<PxPos, PxFieldPoint>&  fPoints)
 {
 	fieldPointMap = fPoints;
 }

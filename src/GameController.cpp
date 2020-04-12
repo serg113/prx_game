@@ -9,7 +9,6 @@
 #include <random>
 #include <iostream>
 #include <map>
-#include <exception>
 
 
 using namespace sf;
@@ -26,8 +25,6 @@ void GameController::startGame() {
     _app->setFramerateLimit(60);
     run();
 }
-
-
 
 
 void GameController::run() {
@@ -70,14 +67,10 @@ void GameController::run() {
 
 	std::map<PxPos, PxFieldPoint> fieldPointsMap;
 
-	
 	float offset = (tileSize - figureSize) / 2.0;
 	std::random_device rd;
 
 	std::vector<Texture> pawnTextures = { redTxt, greenTxt, blueTxt, violetTxt };
-	std::vector<TileType> pawnColors
-		= { TileType::RedPawn, TileType::GreenPawn, TileType::BluePawn, TileType::VioletPawn };
-
 
 	for (int i = 0; i < rowCount; ++i) 
 	{
@@ -93,25 +86,35 @@ void GameController::run() {
 			tile->setPosition(startPosX + tileSize * i, startPosY + tileSize * j);
 
 			// foreground initialization part
-			unsigned int pawnColorIndex = rd() % getPawnCount();
+			int counter = 0;
+			while (counter < 100)
+			{
+				unsigned int pawnColorIndex = rd() % getPawnCount();
 
-			Sprite* pawn = new Sprite(pawnTextures[pawnColorIndex]);
+				Sprite* pawn = new Sprite(pawnTextures[pawnColorIndex]);
 
-			pawn->setPosition(startPosX + tileSize * i + offset/2, startPosY + tileSize * j + offset/2);
+				pawn->setPosition(startPosX + tileSize * i + offset / 2, startPosY + tileSize * j + offset / 2);
 
-			
-			fieldPointsMap.emplace(PxPos(i, j), PxFieldPoint(tile, pawn));
+				fieldPointsMap.emplace(PxPos(i, j), PxFieldPoint(tile, pawn));
+
+				if (matchThreeInSequenceDirectionX(fieldPointsMap, PxPos(i, j)).size() == 0
+					&& matchThreeInSequenceDirectionY(fieldPointsMap, PxPos(i, j)).size() == 0)
+					break;
+				counter++;
+			}
 		}
 	}
 	
 
 	PxEngineFacade engine;
+	MatchThreeInDirectionXY matchDxy;
 
 	engine.setGameMap(fieldPointsMap)
 		->enableMovement(Movement2D::DXY)
-		->addPatternToMatch(&matchThreeInSequenceDirectionX, &deleteMatchingPoints);
+		->addPatternToMatch(&matchDxy);
+		//->addPatternToMatch(&matchThreeInSequenceDirectionXY, &deleteMatchingPoints);
+		//->addPatternToMatch(&matchThreeInSequenceDirectionY, &deleteMatchingPoints);
 	
-	// engine.setPatternToMatch(Pattern, onSuccess, onFailure)
 
 	PxPos prevPosition;
 	bool isPrevPosValid = false;
@@ -135,7 +138,7 @@ void GameController::run() {
 				if (isPrevPosValid)
 				{
 					engine.setMovement(prevPosition, PxPos(x, y))
-						->checkPatterns()
+						->matchAllPatterns()
 						->resetDifferedBackground(prevPosition);
 
 					isPrevPosValid = false;
