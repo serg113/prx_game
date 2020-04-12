@@ -107,7 +107,11 @@ void GameController::run() {
 
 	PxEngineFacade engine;
 
-	engine.setGameMap(fieldPointsMap)->enableMovement(Movement2D::DXY);
+	engine.setGameMap(fieldPointsMap)
+		->enableMovement(Movement2D::DXY)
+		->addPatternToMatch(&matchThreeInSequenceDirectionX, &deleteMatchingPoints);
+	
+	// engine.setPatternToMatch(Pattern, onSuccess, onFailure)
 
 	PxPos prevPosition;
 	bool isPrevPosValid = false;
@@ -130,7 +134,9 @@ void GameController::run() {
 
 				if (isPrevPosValid)
 				{
-					engine.setMovement(prevPosition, PxPos(x, y))->resetDifferedBackground(prevPosition);
+					engine.setMovement(prevPosition, PxPos(x, y))
+						->checkPatterns()
+						->resetDifferedBackground(prevPosition);
 
 					isPrevPosValid = false;
 				}

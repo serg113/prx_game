@@ -2,20 +2,21 @@
 
 #include "PatternsBase.h"
 
-void resetLastMovement(IResettableEngine* engine);
 
 class PxEngineFacade
 {
 public:
 	PxEngineFacade();
+	PxEngineFacade* draw(sf::RenderWindow* app);
+	PxEngineFacade* enableMovement(Movement2D dir);
+	PxEngineFacade* setGameMap(std::map<PxPos, PxFieldPoint> fieldPointMap);
+	PxEngineFacade* addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = nullptr);
+
+	PxEngineFacade* checkPatterns();
+	PxEngineFacade* setMovement(PxPos start, PxPos end);
 	PxEngineFacade* setDifferedBackground(PxPos position, sf::Texture* txt);
 	PxEngineFacade* resetDifferedBackground(PxPos position);
-	PxEngineFacade* enableMovement(Movement2D dir);
-	PxEngineFacade* draw(sf::RenderWindow* app);
-	PxEngineFacade* setGameMap(std::map<PxPos, PxFieldPoint> fieldPointMap);
-	PxEngineFacade* setMovement(PxPos start, PxPos end);
-	PxEngineFacade* checkPattern(PatternCB_t pattern);
-	PxEngineFacade* performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = resetLastMovement);
+
 
 private:
 	PxEngineBase* engine;

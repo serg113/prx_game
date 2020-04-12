@@ -6,26 +6,24 @@
 #include <map>
 
 
-class PxEngine : public PxEngineBase, public IResettableEngine, public IPatternMatchable2D
+class PxEngine : public PxEngineBase, public PatternFailureInterface
 {
 public:
 	PxEngine();
-	virtual void resetMovement() override;
-	virtual void matchThreeInSequenceDirectionX() override;
-	virtual void matchThreeInSequenceDirectoryY() override;
-	virtual void matchFourInSquare() override;
-	virtual void matchTypeT() override;
+	
+	virtual void resetMovement(PxPos prev, PxPos curr) override;
 
+	void setFieldPointMap(const std::map<PxPos, PxFieldPoint> fieldPointMap);
+	void enableMovementDirections(Movement2D dir);
+	void addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = nullptr);
+
+	void checkPatterns();
+	void setMovement(const PxPos firstPos, const PxPos secondPos);
 	void setDifferedBackground(PxPos position, sf::Texture* txt);
 	void resetDifferedBackground(PxPos position);
 
-	void enableMovementDirections(Movement2D dir);
-	void setFieldPointMap(const std::map<PxPos, PxFieldPoint> fieldPointMap);
-	void setMovement(const PxPos firstPos, const PxPos secondPos);
-	void checkPattern(PatternCB_t pattern);
-	void performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction);
 
-	std::vector<PxFieldPoint> getPatternMatchPoints(PatternCB_t pattern) const;
+	std::vector<PxPos> getPatternMatchPoints(PatternCB_t pattern) const;
 	std::map<PxPos, PxFieldPoint> getFieldPointMap() const;
 
 	void drawMap(sf::RenderWindow* app);
@@ -36,7 +34,16 @@ private:
 
 
 	std::map<PxPos, PxFieldPoint> fieldPointMap;
-	std::vector<PxFieldPoint> matchPoints;
+	std::vector<PxPos> matchPoints;
+
+	struct PatternCB
+	{
+		PatternCB_t pattern;
+		ActOnSuccessCB_t matchingAction;
+		ActOnFailCB_t failureAction;
+	};
+
+	std::vector<PatternCB> patterns;
 
 	PxPos firstPos;
 	PxPos secondPos;

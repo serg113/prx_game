@@ -9,6 +9,30 @@
 PxEngine::PxEngine() {};
 
 
+void PxEngine::addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
+{
+	patterns.push_back({ pattern, matchingAction, failureAction });
+}
+
+void PxEngine::checkPatterns()
+{
+	for (auto patt_cb : patterns)
+	{
+		auto points = patt_cb.pattern(fieldPointMap, firstPos);
+
+		auto sPoints = patt_cb.pattern(fieldPointMap, secondPos);
+
+		points.insert(points.end(), sPoints.begin(), sPoints.end());
+		
+		if (points.size() > 0)
+			patt_cb.matchingAction(fieldPointMap, points);
+		else
+			resetMovement(firstPos, secondPos);
+	}
+	
+}
+
+
 void PxEngine::setDifferedBackground(PxPos position, sf::Texture* txt)
 {
 	fieldPointMap[position].bgTxt = fieldPointMap[position].bgTile->getTexture();
@@ -22,7 +46,7 @@ void PxEngine::resetDifferedBackground(PxPos position)
 }
 
 
-void PxEngine::enableMovementDirections(Movement2D dir)
+void PxEngine::enableMovementDirections(Movement2D dir) // not implemented
 {
 	switch (dir)
 	{
@@ -55,23 +79,8 @@ void PxEngine::swapTextures(sf::Sprite* lhs, sf::Sprite* rhs)
 	rhs->setTexture(*temp, true);
 }
 
-void PxEngine::checkPattern(PatternCB_t pattern)
-{
-	for (auto exPoint : { firstPos, secondPos })
-		for (auto matchPoint : pattern(fieldPointMap, fieldPointMap[exPoint]))
-			matchPoints.push_back(matchPoint);
-}
 
-void PxEngine::performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
-{
-	if (matchPoints.empty())
-		failureAction(this);
-	else
-		matchingAction(this);
-}
-
-
-std::vector<PxFieldPoint> PxEngine::getPatternMatchPoints(PatternCB_t pattern) const
+std::vector<PxPos> PxEngine::getPatternMatchPoints(PatternCB_t pattern) const
 {
 	return this->matchPoints;
 }
@@ -81,37 +90,19 @@ std::map<PxPos, PxFieldPoint> PxEngine::getFieldPointMap() const
 	return this->fieldPointMap;
 }
 
-void PxEngine::resetMovement()
+void PxEngine::resetMovement(PxPos prev, PxPos curr)
 {
-	std::swap(fieldPointMap[this->firstPos].pawn, fieldPointMap[this->secondPos].pawn);
-}
-
-void PxEngine::matchThreeInSequenceDirectionX()
-{ 
-	throw std::exception("[not implemented] matchThreeInSequenceDirectionX()");
-}
-
-void PxEngine::matchThreeInSequenceDirectoryY()
-{
-	throw std::exception("[not implemented] matchThreeInSequenceDirectionY()");
-}
-
-void PxEngine::matchFourInSquare()
-{
-	throw std::exception("[not implemented] matchFourInSquare()");
-}
-
-void PxEngine::matchTypeT()
-{
-	throw std::exception("[not implemented] matchTypeT()");
+	swapTextures(fieldPointMap[prev].pawn, fieldPointMap[curr].pawn);
 }
 
 void PxEngine::drawMap(sf::RenderWindow* app)
 {
 	for (auto point : fieldPointMap)
 	{
-		app->draw(*(point.second.bgTile));
-		app->draw(*(point.second.pawn));
+		if(point.second.bgTile != nullptr)
+			app->draw(*(point.second.bgTile));
+		if(point.second.pawn != nullptr)
+			app->draw(*(point.second.pawn));
 	}
 };
 

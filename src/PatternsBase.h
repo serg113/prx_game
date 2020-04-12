@@ -5,25 +5,34 @@
 #include <map>
 #include <vector>
 
+
 class PxEngineBase
 {
 public:
 	virtual ~PxEngineBase() = default;
 };
 
-class IResettableEngine
+class PxPos;
+
+class PatternFailureInterface
 {
 public:
-	virtual void resetMovement() = 0;
+	virtual void resetMovement(PxPos prev, PxPos curr) = 0;
+};
+
+class PatternSuccessInterface
+{
+public:
+	virtual void deleteMatchingPoints(std::vector<PxPos> points) = 0;
 };
 
 class IPatternMatchable2D
 {
 public:
-	virtual void matchThreeInSequenceDirectionX() = 0;
-	virtual void matchThreeInSequenceDirectoryY() = 0;
-	virtual void matchFourInSquare() = 0;
-	virtual void matchTypeT() = 0;
+	virtual std::vector<PxPos> matchThreeInSequenceDirectionX() = 0;
+	virtual std::vector<PxPos> matchThreeInSequenceDirectoryY() = 0;
+	virtual std::vector<PxPos> matchFourInSquare() = 0;
+	virtual std::vector<PxPos> matchTypeT() = 0;
 };
 
 class PxPos 
@@ -47,6 +56,14 @@ struct PxFieldPoint
 
 enum class Movement2D {DX, DY, DXY};
 
-typedef std::vector<PxFieldPoint>(*PatternCB_t)(std::map<PxPos, PxFieldPoint>, PxFieldPoint);
-typedef void(*ActOnSuccessCB_t)(IPatternMatchable2D* engine);
-typedef void(*ActOnFailCB_t)(IResettableEngine* engine);
+typedef std::vector<PxPos>(*PatternCB_t)(std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos);
+typedef void(*ActOnSuccessCB_t)(std::map<PxPos, PxFieldPoint>&, std::vector<PxPos>);
+typedef void(*ActOnFailCB_t)(PxPos prev, PxPos curr);
+
+
+std::vector<PxPos> matchThreeInSequenceDirectionX(std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos position);
+
+void deleteMatchingPoints(std::map<PxPos, PxFieldPoint>& fieldPointMap, std::vector<PxPos> matchPoints);
+
+
+

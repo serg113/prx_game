@@ -51,29 +51,18 @@ PxEngineFacade* PxEngineFacade::setMovement(PxPos firstPos, PxPos secondPos)
 	return this;
 }
 
-PxEngineFacade* PxEngineFacade::checkPattern(PatternCB_t pattern)
+PxEngineFacade* PxEngineFacade::checkPatterns()
 {
-	dynamic_cast<PxEngine*>(engine)->checkPattern(pattern);
-	
-	return this;
-}
-
-PxEngineFacade* PxEngineFacade::performMatchingAction(ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
-{
-	dynamic_cast<PxEngine*>(engine)->performMatchingAction(matchingAction, failureAction);
+	dynamic_cast<PxEngine*>(engine)->checkPatterns();
 	
 	return this;
 }
 
 
-// free functions
-
-void resetLastMovement(IResettableEngine* engine)
+PxEngineFacade* PxEngineFacade::addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction)
 {
-	std::cout << "[info] start of resetLastMovement" << std::endl;
+	dynamic_cast<PxEngine*>(engine)->addPatternToMatch(pattern, matchingAction, failureAction);
 
-	engine->resetMovement();
-
-	std::cout << "[info] end of resetLastMovement" << std::endl;
+	return this;
 }
 
