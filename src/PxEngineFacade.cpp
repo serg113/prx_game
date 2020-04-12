@@ -9,6 +9,20 @@ PxEngineFacade::PxEngineFacade()
 	engine = new PxEngine();
 }
 
+PxEngineFacade* PxEngineFacade::setConfigs(Config params)
+{
+	dynamic_cast<PxEngine*>(engine)->setConfigs(params);
+
+	return this;
+}
+
+PxEngineFacade* PxEngineFacade::initGameMap()
+{
+	dynamic_cast<PxEngine*>(engine)->initGameMap();
+
+	return this;
+}
+
 PxEngineFacade* PxEngineFacade::setDifferedBackground(PxPos position, sf::Texture* txt)
 {
 	dynamic_cast<PxEngine*>(engine)->setDifferedBackground(position, txt);
@@ -23,13 +37,6 @@ PxEngineFacade* PxEngineFacade::resetDifferedBackground(PxPos position)
 	return this;
 }
 
-PxEngineFacade* PxEngineFacade::enableMovement(Movement2D dir)
-{
-	dynamic_cast<PxEngine*>(engine)->enableMovementDirections(dir);
-
-	return this;
-}
-
 PxEngineFacade* PxEngineFacade::draw(sf::RenderWindow* app)
 {
 	dynamic_cast<PxEngine*>(engine)->drawMap(app);
@@ -37,16 +44,10 @@ PxEngineFacade* PxEngineFacade::draw(sf::RenderWindow* app)
 	return this;
 }
 
-PxEngineFacade* PxEngineFacade::setGameMap(std::map<PxPos, PxFieldPoint> fieldPointMap)
-{
-	dynamic_cast<PxEngine*>(engine)->setFieldPointMap(fieldPointMap);
 
-	return this;
-}
-
-PxEngineFacade* PxEngineFacade::setMovement(PxPos firstPos, PxPos secondPos)
+PxEngineFacade* PxEngineFacade::swapPawns(PxPos firstPos, PxPos secondPos)
 {
-	dynamic_cast<PxEngine*>(engine)->setMovement(firstPos, secondPos);
+	dynamic_cast<PxEngine*>(engine)->swapPawns(firstPos, secondPos);
 
 	return this;
 }

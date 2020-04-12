@@ -57,64 +57,26 @@ void GameController::run() {
 	blueTxt = getTexture(TileType::BluePawn);
 	violetTxt = getTexture(TileType::VioletPawn);
 
-	size_t tileSize    = getBgTileSize();
-	size_t figureSize  = getPawnSize();
-	size_t rowCount    = getRowCount();
-	size_t columnCount = getColumnCount();
-	size_t startPosX   = getStartPosX();
-	size_t startPosY   = getStartPosY();
+	// init config to pass into engine
+	Config initParams;
+
+	initParams.boardStartPosX = getStartPosX();
+	initParams.boardStartPosY = getStartPosY();
+	initParams.rowCount = getRowCount();
+	initParams.columnCount = getColumnCount();
+	initParams.bgTileSize = getBgTileSize();
+	initParams.figureSize = getPawnSize();
+	initParams.backgroundTxts = { &bgTxt1, &bgTxt2, &bgTxt3 };
+	initParams.figureTxts = { &redTxt, &greenTxt, &blueTxt, &violetTxt };
 
 
-	std::map<PxPos, PxFieldPoint> fieldPointsMap;
-
-	float offset = (tileSize - figureSize) / 2.0;
-	std::random_device rd;
-
-	std::vector<Texture> pawnTextures = { redTxt, greenTxt, blueTxt, violetTxt };
-
-	for (int i = 0; i < rowCount; ++i) 
-	{
-		for (int j = 0; j < columnCount; ++j) 
-		{
-			// background initialization part
-			Sprite* tile;
-			if ((i + j) % 2 == 0) 
-				tile = new Sprite(bgTxt1);
-			else
-				tile = new Sprite(bgTxt2);
-
-			tile->setPosition(startPosX + tileSize * i, startPosY + tileSize * j);
-
-			// foreground initialization part
-			int counter = 0;
-			while (counter < 100)
-			{
-				unsigned int pawnColorIndex = rd() % getPawnCount();
-
-				Sprite* pawn = new Sprite(pawnTextures[pawnColorIndex]);
-
-				pawn->setPosition(startPosX + tileSize * i + offset / 2, startPosY + tileSize * j + offset / 2);
-
-				fieldPointsMap.emplace(PxPos(i, j), PxFieldPoint(tile, pawn));
-
-				if (matchThreeInSequenceDirectionX(fieldPointsMap, PxPos(i, j)).size() == 0
-					&& matchThreeInSequenceDirectionY(fieldPointsMap, PxPos(i, j)).size() == 0)
-					break;
-				counter++;
-			}
-		}
-	}
-	
-
-	PxEngineFacade engine;
 	MatchThreeInDirectionXY matchDxy;
+	PxEngineFacade engine;
 
-	engine.setGameMap(fieldPointsMap)
-		->enableMovement(Movement2D::DXY)
-		->addPatternToMatch(&matchDxy);
-		//->addPatternToMatch(&matchThreeInSequenceDirectionXY, &deleteMatchingPoints);
-		//->addPatternToMatch(&matchThreeInSequenceDirectionY, &deleteMatchingPoints);
-	
+	engine.setConfigs(initParams)
+		->addPatternToMatch(&matchDxy)
+		->initGameMap();
+
 
 	PxPos prevPosition;
 	bool isPrevPosValid = false;
@@ -132,12 +94,12 @@ void GameController::run() {
                 _app->close();
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				int x = static_cast<int>((event.mouseButton.x - startPosX) / tileSize);
-				int y = static_cast<int>((event.mouseButton.y - startPosY) / tileSize);
+				int x = static_cast<int>((event.mouseButton.x - initParams.boardStartPosX) / initParams.bgTileSize);
+				int y = static_cast<int>((event.mouseButton.y - initParams.boardStartPosY) / initParams.bgTileSize);
 
 				if (isPrevPosValid)
 				{
-					engine.setMovement(prevPosition, PxPos(x, y))
+					engine.swapPawns(prevPosition, PxPos(x, y))
 						->matchAllPatterns()
 						->resetDifferedBackground(prevPosition);
 

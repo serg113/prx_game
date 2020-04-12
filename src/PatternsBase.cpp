@@ -60,7 +60,7 @@ std::vector<PxPos> matchThreeInSequenceDirectionXY(std::map<PxPos, PxFieldPoint>
 
 std::vector<PxPos> matchThreeInSequenceDirectionX(std::map<PxPos, PxFieldPoint>& fPointMap, PxPos position)
 {
-	std::cout << "matchThreeInSequenceDirectionX()" << std::endl;
+	//std::cout << "matchThreeInSequenceDirectionX()" << std::endl;
 
 	auto x = position.X;
 	auto y = position.Y;
@@ -87,7 +87,7 @@ std::vector<PxPos> matchThreeInSequenceDirectionX(std::map<PxPos, PxFieldPoint>&
 
 std::vector<PxPos> matchThreeInSequenceDirectionY(std::map<PxPos, PxFieldPoint>& fPointMap, PxPos position)
 {
-	std::cout << "matchThreeInSequenceDirectionY()" << std::endl;
+	//std::cout << "matchThreeInSequenceDirectionY()" << std::endl;
 
 	auto x = position.X;
 	auto y = position.Y;
@@ -116,5 +116,6 @@ void deleteMatchingPoints(std::map<PxPos, PxFieldPoint>& fieldPointMap, std::vec
 {
 	std::cout << "deleteMatchingPoints(ponts = " << matchPoints.size() << " )" << std::endl;
 	for (auto point : matchPoints)
-		fieldPointMap[point].pawn->setTexture(*(fieldPointMap[point].bgTile->getTexture()),true);
+		fieldPointMap[point].isPawnVisible = false;
+		//fieldPointMap[point].pawn->setTexture(*(fieldPointMap[point].bgTile->getTexture()),true);
 }

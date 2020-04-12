@@ -11,28 +11,25 @@ class PxEngine : public PxEngineBase
 {
 public:
 	PxEngine();
-	
-	void setFieldPointMap(const std::map<PxPos, PxFieldPoint>& fieldPointMap);
-	void enableMovementDirections(Movement2D dir);
 
-	// virtual base pattern functionality
+	void setConfigs(Config params);
 	void addPatternToMatch(PxPatternBase* pattern);
+	void initGameMap();// after this step, initialization ends, and board map ready to play 
+
 	void matchAllPatterns();
 
-	// callback patterns functionality
-	void addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = nullptr);
-	void checkPatterns();
-
-	void setMovement(const PxPos firstPos, const PxPos secondPos);
+	void swapPawns(const PxPos firstPos, const PxPos secondPos);
 	void setDifferedBackground(PxPos position, sf::Texture* txt);
 	void resetDifferedBackground(PxPos position);
 
-
-	std::vector<PxPos> getPatternMatchPoints(PatternCB_t pattern) const;
-	std::map<PxPos, PxFieldPoint> getFieldPointMap() const;
-
 	void drawMap(sf::RenderWindow* app);
 	void swapTextures(sf::Sprite*, sf::Sprite*);
+
+	// callback patterns functionality, will be deleted at next iteration
+	void addPatternToMatch(PatternCB_t pattern, ActOnSuccessCB_t matchingAction, ActOnFailCB_t failureAction = nullptr);
+	void checkPatterns();
+
+	void dropDownPawns(PxPos position);
 
 private:
 	void resetMovement(PxPos prev, PxPos curr);
@@ -45,7 +42,9 @@ private:
 	PxPos firstPos;
 	PxPos secondPos;
 
+	Config params;
 
+	// currently useless and may be deleted at next iteration
 	struct PatternCB
 	{
 		PatternCB_t pattern;
@@ -55,10 +54,4 @@ private:
 
 	std::vector<PatternCB> patterns;
 
-	struct Move2D
-	{
-		bool isDxEnabled = false;
-		bool isDyEnabled = false;
-		bool isDxyEnabled = false;
-	} move2d;
 };

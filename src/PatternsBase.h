@@ -6,6 +6,18 @@
 #include <vector>
 #include <set>
 
+struct Config
+{
+	std::vector<sf::Texture*> backgroundTxts;
+	std::vector<sf::Texture*> figureTxts;
+	size_t boardStartPosX;
+	size_t boardStartPosY;
+	size_t rowCount;
+	size_t columnCount;
+	size_t bgTileSize;
+	size_t figureSize;
+
+};
 
 class PxEngineBase
 {
@@ -27,9 +39,11 @@ struct PxFieldPoint
 {
 	PxFieldPoint() = default;
 	PxFieldPoint(sf::Sprite* back, sf::Sprite* front);
+
 	sf::Sprite* bgTile;
 	const sf::Texture* bgTxt;
 	sf::Sprite* pawn;
+	bool isPawnVisible = true;
 };
 
 enum class Movement2D {DX, DY, DXY};

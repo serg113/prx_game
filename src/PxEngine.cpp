@@ -3,10 +3,51 @@
 #include <exception>
 #include <iostream>
 #include <cmath>
+#include <random>
 
 
 
 PxEngine::PxEngine() {};
+
+void PxEngine::setConfigs(Config params)
+{
+	this->params = params;
+}
+
+void PxEngine::initGameMap()
+{
+	float offset = (params.bgTileSize - params.figureSize) / 2.0;
+
+	std::random_device rd;
+
+	for (int i = 0; i < params.rowCount; ++i)
+	{
+		for (int j = 0; j < params.columnCount; ++j)
+		{
+			size_t posX = params.boardStartPosX + params.bgTileSize * i;
+			size_t posY = params.boardStartPosY + params.bgTileSize * j;
+
+			// background initialization part
+			sf::Sprite* tile;
+			if ((i + j) % 2 == 0)  
+				tile = new sf::Sprite(*params.backgroundTxts[0]);
+			else
+				tile = new sf::Sprite(*params.backgroundTxts[1]);
+
+			tile->setPosition(posX, posY);
+
+			// foreground initialization part
+			unsigned int txtIndex = rd() % params.figureTxts.size();
+
+			sf::Sprite* pawn = new sf::Sprite(*params.figureTxts[txtIndex]);
+
+			pawn->setPosition(posX + offset / 2, posY + offset / 2);
+
+			fieldPointMap.emplace(PxPos(i, j), PxFieldPoint(tile, pawn));
+
+		}
+	}
+};
 
 
 void PxEngine::addPatternToMatch(PxPatternBase* pattern)
@@ -21,9 +62,14 @@ void PxEngine::matchAllPatterns()
 		auto points = pxPat->match(fieldPointMap, firstPos, secondPos);
 
 		if (points.size())
-			pxPat->actOnSuccess(fieldPointMap, points);
+		{
+			pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
+		}
 		else
-			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos);
+		{
+			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos); // re-swap figures
+		}
+
 	}
 }
 
@@ -65,22 +111,7 @@ void PxEngine::resetDifferedBackground(PxPos position)
 }
 
 
-void PxEngine::enableMovementDirections(Movement2D dir) // not implemented
-{
-	switch (dir)
-	{
-	case Movement2D::DX: move2d.isDxEnabled = true;
-	case Movement2D::DY: move2d.isDyEnabled = true;
-	case Movement2D::DXY: move2d.isDxyEnabled = true;
-	}
-}
-
-void PxEngine::setFieldPointMap(const std::map<PxPos, PxFieldPoint>&  fPoints)
-{
-	fieldPointMap = fPoints;
-}
-
-void PxEngine::setMovement(const PxPos p1, const PxPos p2)
+void PxEngine::swapPawns(const PxPos p1, const PxPos p2)
 {
 	if (!isMovementPossible(p1, p2))
 		return;
@@ -98,17 +129,6 @@ void PxEngine::swapTextures(sf::Sprite* lhs, sf::Sprite* rhs)
 	rhs->setTexture(*temp, true);
 }
 
-
-std::vector<PxPos> PxEngine::getPatternMatchPoints(PatternCB_t pattern) const
-{
-	return this->matchPoints;
-}
-
-std::map<PxPos, PxFieldPoint> PxEngine::getFieldPointMap() const
-{
-	return this->fieldPointMap;
-}
-
 void PxEngine::resetMovement(PxPos prev, PxPos curr)
 {
 	swapTextures(fieldPointMap[prev].pawn, fieldPointMap[curr].pawn);
@@ -116,14 +136,51 @@ void PxEngine::resetMovement(PxPos prev, PxPos curr)
 
 void PxEngine::drawMap(sf::RenderWindow* app)
 {
-	for (auto point : fieldPointMap)
+	std::random_device rd;
+
+	for (auto& point : fieldPointMap)
 	{
-		if(point.second.bgTile != nullptr)
-			app->draw(*(point.second.bgTile));
-		if(point.second.pawn != nullptr)
-			app->draw(*(point.second.pawn));
+		if (point.second.bgTile != nullptr)
+		{
+			app->draw(*point.second.bgTile);
+		}
+		if (point.second.pawn != nullptr && point.second.isPawnVisible)
+		{
+			app->draw(*point.second.pawn);
+		}
+
+		if (!point.second.isPawnVisible)
+		{
+			dropDownPawns(point.first);
+		}
 	}
 };
+
+void PxEngine::dropDownPawns(PxPos position)
+{
+	auto& point = fieldPointMap[position];
+
+	std::random_device rd;
+
+	if (position.Y == 0)
+	{
+		point.pawn->setTexture(*params.figureTxts[rd() % params.figureTxts.size()], true);
+		point.isPawnVisible = true;
+		std::cout << "point : " << position.X << "-" << position.Y << std::endl;
+	}
+	else
+	{
+		auto itPoint = fieldPointMap.find({ position.X, position.Y - 1 });
+
+		if (itPoint != fieldPointMap.end())
+		{
+			swapTextures(point.pawn, itPoint->second.pawn);
+
+			point.isPawnVisible = !point.isPawnVisible;
+			itPoint->second.isPawnVisible = !itPoint->second.isPawnVisible;
+		}
+	}
+}
 
 bool PxEngine::isMovementPossible(const PxPos p1, const PxPos p2)
 {
