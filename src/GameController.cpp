@@ -2,7 +2,7 @@
 #include "GameController.hpp"
 
 #include "ConfigParser.h"
-#include "PxEngineFacade.h"
+#include "PxEngineBase.h"
 
 #include <string>
 #include <vector>
@@ -71,11 +71,11 @@ void GameController::run() {
 
 
 	MatchThreeInDirectionXY matchDxy;
-	PxEngineFacade engine;
 
-	engine.setConfigs(initParams)
-		->addPatternToMatch(&matchDxy)
-		->initGameMap();
+	auto engine = getEngine()
+				->setConfigs(initParams)
+				->addPatternToMatch(&matchDxy)
+				->initGameMap();
 
 
 	PxPos prevPosition;
@@ -85,7 +85,7 @@ void GameController::run() {
         _app->clear(Color(150, 250, 150, 255));
 		_app->draw(text);
 
-		engine.draw(_app);
+		engine->draw(_app);
 		
         sf::Event event;
         while (_app->pollEvent(event)) {
@@ -94,22 +94,23 @@ void GameController::run() {
                 _app->close();
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				int x = static_cast<int>((event.mouseButton.x - initParams.boardStartPosX) / initParams.bgTileSize);
-				int y = static_cast<int>((event.mouseButton.y - initParams.boardStartPosY) / initParams.bgTileSize);
+				PxPos currentPosition;
+
+				currentPosition.X = static_cast<int>((event.mouseButton.x - initParams.boardStartPosX) / initParams.bgTileSize);
+				currentPosition.Y = static_cast<int>((event.mouseButton.y - initParams.boardStartPosY) / initParams.bgTileSize);
 
 				if (isPrevPosValid)
 				{
-					engine.swapPawns(prevPosition, PxPos(x, y))
-						->matchAllPatterns()
+					engine->swapPawnsAndMatch(prevPosition, currentPosition)
 						->resetDifferedBackground(prevPosition);
 
 					isPrevPosValid = false;
 				}
 				else
 				{
-					prevPosition = PxPos(x, y);
+					prevPosition = currentPosition;
 
-					engine.setDifferedBackground(prevPosition, &bgTxt3);
+					engine->setDifferedBackground(prevPosition, &bgTxt3);
 					
 					isPrevPosValid = true;
 

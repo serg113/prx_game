@@ -1,29 +1,29 @@
 #pragma once
 
-#include "PatternsBase.h"
+#include "PxEngineBase.h"
 
 
-class PxEngineFacade
+class PxEngineFacade: public InitializedEngine, public UnInitializedEngine
 {
 public:
 	PxEngineFacade();
 	// initialization
-	PxEngineFacade* setConfigs(Config params);
-	PxEngineFacade* addPatternToMatch(PxPatternBase* pattern);
-	PxEngineFacade* initGameMap(); 
-	// this step ends board initialization, need to change return interface to InitializedEngine
+	UnInitializedEngine* setConfigs(Config params);
+	UnInitializedEngine* addPatternToMatch(PxPatternBase* pattern);
+	InitializedEngine* initGameMap();
 
 	// basic functionality of engine
-	PxEngineFacade* swapPawns(PxPos pos1, PxPos pos2);
-	PxEngineFacade* matchAllPatterns();
-	PxEngineFacade* setDifferedBackground(PxPos position, sf::Texture* txt);
-	PxEngineFacade* resetDifferedBackground(PxPos position);
+	InitializedEngine* swapPawnsAndMatch(PxPos pos1, PxPos pos2);
+	InitializedEngine* setDifferedBackground(PxPos position, sf::Texture* txt);
+	InitializedEngine* resetDifferedBackground(PxPos position);
 
 	// draw ui
-	PxEngineFacade* draw(sf::RenderWindow* app);
+	InitializedEngine* draw(sf::RenderWindow* app);
 
 private:
 	PxEngineBase* engine;
 
 };
+
+
 
