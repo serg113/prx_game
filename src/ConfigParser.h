@@ -24,6 +24,14 @@ size_t getColumnCount();
 size_t getStartPosX();
 size_t getStartPosY();
 
+struct Pos
+{
+	size_t X;
+	size_t Y;
+	bool isValid = false;
+};
+
+Pos getPositionByCoordinates(int x, int y);
 
 sf::Texture getTexture(TileType tType);
 

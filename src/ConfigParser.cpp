@@ -9,8 +9,8 @@ std::string resFolder = "C:/Users/Sergey/Documents/_cpp/playrix/DevTestGame-mast
 size_t pawnCount = 4; // number of color images
 size_t tileSize = 87;
 size_t figureSize = 60;
-size_t rowCount = 5;
-size_t columnCount = 5;
+size_t rowCount = 7;
+size_t columnCount = 7;
 size_t startPosX = 100;
 size_t startPosY = 100;
 
@@ -54,5 +54,20 @@ sf::Texture getTexture(TileType tType)
 		throw std::exception("[config error] cannot load texture from source: /src/");
 
 	return txt;
+}
+
+Pos getPositionByCoordinates(int x, int y)
+{ 
+	Pos position;
+	
+	if (x > startPosX && y > startPosY)
+		position.isValid = true;
+	else
+		position.isValid = false;
+
+	position.X = static_cast<size_t>((x - startPosX) / tileSize);
+	position.Y = static_cast<size_t>((y - startPosY) / tileSize);
+
+	return position;
 }
 

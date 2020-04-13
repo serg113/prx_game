@@ -94,27 +94,38 @@ void GameController::run() {
                 _app->close();
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				PxPos currentPosition;
+				auto point = getPositionByCoordinates(event.mouseButton.x, event.mouseButton.y);
 
-				currentPosition.X = static_cast<int>((event.mouseButton.x - initParams.boardStartPosX) / initParams.bgTileSize);
-				currentPosition.Y = static_cast<int>((event.mouseButton.y - initParams.boardStartPosY) / initParams.bgTileSize);
-
-				if (isPrevPosValid)
+				if (!point.isValid)
 				{
-					engine->swapPawnsAndMatch(prevPosition, currentPosition)
-						->resetDifferedBackground(prevPosition);
+					engine->resetDifferedBackground(prevPosition);
 
 					isPrevPosValid = false;
 				}
 				else
 				{
-					prevPosition = currentPosition;
+					PxPos currentPosition(point.X, point.Y);
 
-					engine->setDifferedBackground(prevPosition, &bgTxt3);
-					
-					isPrevPosValid = true;
+					if (isPrevPosValid)
+					{
+						engine->swapPawnsAndMatch(prevPosition, currentPosition)
+							->resetDifferedBackground(prevPosition);
+
+						isPrevPosValid = false;
+					}
+					else
+					{
+						prevPosition = currentPosition;
+
+						engine->setDifferedBackground(prevPosition, &bgTxt3);
+
+						isPrevPosValid = true;
+
+					}
 
 				}
+
+				
 			}
 			
         }
