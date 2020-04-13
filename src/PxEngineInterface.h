@@ -13,8 +13,7 @@ public:
 	virtual void addPatternToMatch(PxPattern* pattern) = 0;
 	virtual void initGameMap() = 0;
 
-	virtual void swapPawns(const PxPos firstPos, const PxPos secondPos) = 0;
-	virtual void matchAllPatterns() = 0;
+	virtual void swapPawnsAndMatch(const PxPos firstPos, const PxPos secondPos) = 0;
 	virtual void setDifferedBackground(PxPos position, sf::Texture* txt) = 0;
 	virtual void resetDifferedBackground(PxPos position) = 0;
 

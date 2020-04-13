@@ -29,22 +29,7 @@ void GameController::startGame() {
 
 
 void GameController::run() {
-	std::string resFolder = "C:/Users/Sergey/Documents/_cpp/playrix/DevTestGame-master/resources/";
-
-	sf::Font font;
-	if (!font.loadFromFile(resFolder + "STENCIL.TTF"))
-	{
-		std::cout << "error occured during reading fonts" << std::endl;
-	}
-
-	sf::Text text;
-	text.setFont(font);
-	text.setString("Keep  calm  and  hello  world");
-	text.setCharacterSize(32);
-	text.setFillColor(sf::Color::Black);
-	text.setStyle(sf::Text::Underlined);
-
-  
+	
 	initConfig();
 
 	Texture bgTxt1, bgTxt2, bgTxt3, redTxt, greenTxt, blueTxt, violetTxt;
@@ -71,19 +56,12 @@ void GameController::run() {
 	initParams.figureTxts = { &redTxt, &greenTxt, &blueTxt, &violetTxt };
 
 
-	/*
-	 messy naming need to be corrected
-	 main header to include -> PxMatchGame.h
-
-
-	*/
-
 	MatchThreeInDirectionXY matchDxy;
 
 	auto engine = getEngine()
-				->setConfigs(initParams)
-				->addPatternToMatch(&matchDxy)
-				->initGameMap();
+		->setConfigs(initParams)
+		->addPatternToMatch(&matchDxy)
+		->initGameMap();
 
 
 	PxPos prevPosition;
@@ -91,8 +69,7 @@ void GameController::run() {
     
 	while (_app->isOpen()) {
         _app->clear(Color(150, 250, 150, 255));
-		_app->draw(text);
-
+		
 		engine->draw(_app);
 		
         sf::Event event;
@@ -100,6 +77,7 @@ void GameController::run() {
             // "close requested" event: we close the window
             if (event.type == sf::Event::Closed)
                 _app->close();
+
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
 				auto point = getPositionByCoordinates(event.mouseButton.x, event.mouseButton.y);
@@ -142,3 +120,21 @@ void GameController::run() {
 }
 
 
+/*
+std::string resFolder = "C:/Users/Sergey/Documents/_cpp/playrix/DevTestGame-master/resources/";
+
+	sf::Font font;
+	if (!font.loadFromFile(resFolder + "STENCIL.TTF"))
+	{
+		std::cout << "error occured during reading fonts" << std::endl;
+	}
+
+	sf::Text text;
+	text.setFont(font);
+	text.setString("Keep  calm  and  hello  world");
+	text.setCharacterSize(32);
+	text.setFillColor(sf::Color::Black);
+	text.setStyle(sf::Text::Underlined);
+
+	_app->draw(text);
+*/

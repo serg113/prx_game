@@ -52,8 +52,7 @@ InitializedEngine* PxMatchGameFacade::draw(sf::RenderWindow* app)
 
 InitializedEngine* PxMatchGameFacade::swapPawnsAndMatch(PxPos firstPos, PxPos secondPos)
 {
-	engine->swapPawns(firstPos, secondPos);
-	engine->matchAllPatterns();
+	engine->swapPawnsAndMatch(firstPos, secondPos);
 
 	return this;
 }

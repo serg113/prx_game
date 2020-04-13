@@ -18,8 +18,7 @@ public:
 	// after this step, initialization ends, and board map ready to play 
 
 	// engine basic functionality
-	void swapPawns(const PxPos firstPos, const PxPos secondPos);
-	void matchAllPatterns();
+	void swapPawnsAndMatch(const PxPos firstPos, const PxPos secondPos);
 	void setDifferedBackground(PxPos position, sf::Texture* txt);
 	void resetDifferedBackground(PxPos position);
 
@@ -31,11 +30,11 @@ private:
 	void dropDownPawns(PxPos position);
 	void resetMovement(PxPos prev, PxPos curr);
 	bool isMovementPossible(const PxPos p1, const PxPos p2);
-
+	sf::Sprite* getBackgroundSprite(size_t X, size_t Y, bool isEven) const;
+	sf::Sprite* getForegroundSprite(size_t X, size_t Y) const;
+	bool checkPatternMatched(PxPos pos) const;
 
 	Config params;
-	PxPos firstPos;
-	PxPos secondPos;
 
 	std::map<PxPos, PxFieldPoint> fieldPointMap;
 	std::vector<const PxPattern*> pxPatterns;

@@ -15,10 +15,6 @@ void PxEngine::setConfigs(Config params)
 
 void PxEngine::initGameMap()
 {
-	float offset = (params.bgTileSize - params.figureSize) / 2.0;
-
-	std::random_device rd;
-
 	for (int i = 0; i < params.rowCount; ++i)
 	{
 		for (int j = 0; j < params.columnCount; ++j)
@@ -26,27 +22,55 @@ void PxEngine::initGameMap()
 			size_t posX = params.boardStartPosX + params.bgTileSize * i;
 			size_t posY = params.boardStartPosY + params.bgTileSize * j;
 
-			// background initialization part
-			sf::Sprite* tile;
-			if ((i + j) % 2 == 0)  
-				tile = new sf::Sprite(*params.backgroundTxts[0]);
-			else
-				tile = new sf::Sprite(*params.backgroundTxts[1]);
+			sf::Sprite* bgTile = getBackgroundSprite(posX, posY, (i + j) % 2);
 
-			tile->setPosition(posX, posY);
+			while (true)
+			{
+				sf::Sprite* pawn = getForegroundSprite(posX, posY);
 
-			// foreground initialization part
-			unsigned int txtIndex = rd() % params.figureTxts.size();
+				fieldPointMap.emplace(PxPos(i, j), PxFieldPoint(bgTile, pawn));
 
-			sf::Sprite* pawn = new sf::Sprite(*params.figureTxts[txtIndex]);
+				if (!checkPatternMatched(PxPos(i, j)))
+					break;
 
-			pawn->setPosition(posX + offset / 2, posY + offset / 2);
-
-			fieldPointMap.emplace(PxPos(i, j), PxFieldPoint(tile, pawn));
-
+				fieldPointMap.erase(PxPos(i, j));				
+			}
 		}
 	}
 };
+
+bool PxEngine::checkPatternMatched(PxPos pos) const
+{
+	for (auto pxPat : pxPatterns)
+		if (pxPat->match(fieldPointMap, pos).size())
+			return true;
+	
+	return false;
+}
+
+sf::Sprite* PxEngine::getForegroundSprite(size_t X, size_t Y) const 
+{
+	std::random_device rd; 
+
+	float offset = (params.bgTileSize - params.figureSize) / 2.0; 
+
+	size_t txtIndex = rd() % params.figureTxts.size();
+
+	sf::Sprite* pawn = new sf::Sprite(*params.figureTxts[txtIndex]);
+
+	pawn->setPosition(X + offset / 2, Y + offset / 2);
+
+	return pawn;
+}
+
+sf::Sprite* PxEngine::getBackgroundSprite(size_t X, size_t Y, bool isEven) const
+{	
+	sf::Sprite* tile = new sf::Sprite(*params.backgroundTxts[isEven]);
+
+	tile->setPosition(X, Y);
+
+	return tile;
+}
 
 
 void PxEngine::addPatternToMatch(PxPattern* pattern)
@@ -54,23 +78,6 @@ void PxEngine::addPatternToMatch(PxPattern* pattern)
 	pxPatterns.push_back(pattern);
 }
 
-void PxEngine::matchAllPatterns()
-{
-	for (auto pxPat : pxPatterns)
-	{
-		auto points = pxPat->match(fieldPointMap, firstPos, secondPos);
-
-		if (points.size())
-		{
-			pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
-		}
-		else
-		{
-			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos); // re-swap figures
-		}
-
-	}
-}
 
 void PxEngine::setDifferedBackground(PxPos position, sf::Texture* txt)
 {
@@ -85,15 +92,29 @@ void PxEngine::resetDifferedBackground(PxPos position)
 }
 
 
-void PxEngine::swapPawns(const PxPos p1, const PxPos p2)
+void PxEngine::swapPawnsAndMatch(const PxPos firstPos, const PxPos secondPos)
 {
-	if (!isMovementPossible(p1, p2))
+	if (!isMovementPossible(firstPos, secondPos))
 		return;
 
-	firstPos = p1;
-	secondPos = p2;
+	swapTextures(fieldPointMap[firstPos].pawn, fieldPointMap[secondPos].pawn);
 
-	swapTextures(fieldPointMap[p1].pawn, fieldPointMap[p2].pawn);
+	for (auto pxPat : pxPatterns)
+	{
+		auto points = pxPat->match(fieldPointMap, firstPos);
+		auto points2 = pxPat->match(fieldPointMap, secondPos);
+
+		points.insert(points2.begin(), points2.end());
+
+		if (points.size())
+		{
+			pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
+		}
+		else
+		{
+			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos); // re-swap figures
+		}
+	}
 }
 
 void PxEngine::swapTextures(sf::Sprite* lhs, sf::Sprite* rhs)
@@ -110,31 +131,36 @@ void PxEngine::resetMovement(PxPos prev, PxPos curr)
 
 void PxEngine::drawMap(sf::RenderWindow* app)
 {
-	std::random_device rd;
-
 	for (auto& point : fieldPointMap)
-	{
+	{	
 		if (point.second.bgTile != nullptr)
-		{
 			app->draw(*point.second.bgTile);
-		}
+		
 		if (point.second.pawn != nullptr && point.second.isPawnVisible)
-		{
 			app->draw(*point.second.pawn);
-		}
-
+		
 		if (!point.second.isPawnVisible)
 		{
 			dropDownPawns(point.first);
+
+			for (auto pxPat : pxPatterns)
+			{
+				auto points = pxPat->match(fieldPointMap, point.first);
+
+				if (points.size())
+					pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
+			}
 		}
 	}
+	
+
 };
 
 void PxEngine::dropDownPawns(PxPos position)
 {
-	auto& point = fieldPointMap[position];
-
 	std::random_device rd;
+
+	auto& point = fieldPointMap[position];
 
 	if (position.Y == 0)
 	{

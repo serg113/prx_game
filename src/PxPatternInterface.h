@@ -12,7 +12,7 @@ class PxPattern
 {
 public:
 	/* returns matching positions according to pattern combined for two swapped points */
-	virtual std::set<PxPos> match(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const = 0;
+	virtual std::set<PxPos> match(const std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position) const = 0;
 
 	/* action that need to be performed if match() returns not empty set */
 	virtual void actOnSuccess(std::map<PxPos, PxFieldPoint>& fieldMap, std::set<PxPos>& points) const = 0;
