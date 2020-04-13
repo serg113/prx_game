@@ -1,26 +1,9 @@
-#include "PatternsBase.h"
-#include "ConfigParser.h"
+#include "PxPattern.h"
+
 #include <iostream>
 #include <set>
 
-PxFieldPoint::PxFieldPoint(sf::Sprite* back, sf::Sprite* front) : bgTile(back), pawn(front) {};
 
-PxPos::PxPos() :X(0), Y(0) {};
-PxPos::PxPos(size_t x, size_t y) :X(x), Y(y) {};
-
-bool operator<(const PxPos& lhs, const PxPos& rhs)
-{
-	return (lhs.X * 100 + lhs.Y) < (rhs.X * 100 + rhs.Y);
-}
-
-void swapTextures(sf::Sprite* lhs, sf::Sprite* rhs)
-{
-	const sf::Texture* temp = lhs->getTexture();
-	lhs->setTexture(*(rhs->getTexture()), true);
-	rhs->setTexture(*temp, true);
-}
-
-// pattern base
 std::set<PxPos> MatchThreeInDirectionXY::match(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const
 {
 	std::set<PxPos> matchPoints;
@@ -45,7 +28,7 @@ void MatchThreeInDirectionXY::actOnFailure(std::map<PxPos, PxFieldPoint>& fieldM
 }
 
 
-//end of pattern base
+
 
 std::vector<PxPos> matchThreeInSequenceDirectionXY(std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos position)
 {
@@ -118,4 +101,12 @@ void deleteMatchingPoints(std::map<PxPos, PxFieldPoint>& fieldPointMap, std::vec
 	for (auto point : matchPoints)
 		fieldPointMap[point].isPawnVisible = false;
 		//fieldPointMap[point].pawn->setTexture(*(fieldPointMap[point].bgTile->getTexture()),true);
+}
+
+
+void swapTextures(sf::Sprite* lhs, sf::Sprite* rhs)
+{
+	const sf::Texture* temp = lhs->getTexture();
+	lhs->setTexture(*(rhs->getTexture()), true);
+	rhs->setTexture(*temp, true);
 }

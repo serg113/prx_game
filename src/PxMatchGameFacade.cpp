@@ -1,50 +1,50 @@
 #include "PxEngine.h"
-#include "PxEngineFacade.h"
+#include "PxMatchGameFacade.h"
 
 #include <iostream>
 
 
-PxEngineFacade::PxEngineFacade() 
+PxMatchGameFacade::PxMatchGameFacade()
 {
 	engine = new PxEngine();
 }
 
-UnInitializedEngine* PxEngineFacade::setConfigs(Config params)
+UnInitializedEngine* PxMatchGameFacade::setConfigs(Config params)
 {
 	dynamic_cast<PxEngine*>(engine)->setConfigs(params);
 
 	return this;
 }
 
-UnInitializedEngine* PxEngineFacade::addPatternToMatch(PxPatternBase* pattern)
+UnInitializedEngine* PxMatchGameFacade::addPatternToMatch(PxPattern* pattern)
 {
 	dynamic_cast<PxEngine*>(engine)->addPatternToMatch(pattern);
 
 	return this;
 }
 
-InitializedEngine* PxEngineFacade::initGameMap()
+InitializedEngine* PxMatchGameFacade::initGameMap()
 {
 	dynamic_cast<PxEngine*>(engine)->initGameMap();
 
 	return this;
 }
 
-InitializedEngine* PxEngineFacade::setDifferedBackground(PxPos position, sf::Texture* txt)
+InitializedEngine* PxMatchGameFacade::setDifferedBackground(PxPos position, sf::Texture* txt)
 {
 	dynamic_cast<PxEngine*>(engine)->setDifferedBackground(position, txt);
 
 	return this;
 }
 
-InitializedEngine* PxEngineFacade::resetDifferedBackground(PxPos position)
+InitializedEngine* PxMatchGameFacade::resetDifferedBackground(PxPos position)
 {
 	dynamic_cast<PxEngine*>(engine)->resetDifferedBackground(position);
 
 	return this;
 }
 
-InitializedEngine* PxEngineFacade::draw(sf::RenderWindow* app)
+InitializedEngine* PxMatchGameFacade::draw(sf::RenderWindow* app)
 {
 	dynamic_cast<PxEngine*>(engine)->drawMap(app);
 
@@ -52,7 +52,7 @@ InitializedEngine* PxEngineFacade::draw(sf::RenderWindow* app)
 }
 
 
-InitializedEngine* PxEngineFacade::swapPawnsAndMatch(PxPos firstPos, PxPos secondPos)
+InitializedEngine* PxMatchGameFacade::swapPawnsAndMatch(PxPos firstPos, PxPos secondPos)
 {
 	dynamic_cast<PxEngine*>(engine)->swapPawns(firstPos, secondPos);
 	dynamic_cast<PxEngine*>(engine)->matchAllPatterns();

@@ -2,7 +2,8 @@
 #include "GameController.hpp"
 
 #include "ConfigParser.h"
-#include "PxEngineBase.h"
+#include "PxMatchGameInterface.h"
+#include "PxPattern.h"
 
 #include <string>
 #include <vector>
@@ -69,6 +70,13 @@ void GameController::run() {
 	initParams.backgroundTxts = { &bgTxt1, &bgTxt2, &bgTxt3 };
 	initParams.figureTxts = { &redTxt, &greenTxt, &blueTxt, &violetTxt };
 
+
+	/*
+	 messy naming need to be corrected
+	 main header to include -> PxMatchGame.h
+
+
+	*/
 
 	MatchThreeInDirectionXY matchDxy;
 

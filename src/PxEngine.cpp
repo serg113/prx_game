@@ -6,7 +6,6 @@
 #include <random>
 
 
-
 PxEngine::PxEngine() {};
 
 void PxEngine::setConfigs(Config params)
@@ -50,7 +49,7 @@ void PxEngine::initGameMap()
 };
 
 
-void PxEngine::addPatternToMatch(PxPatternBase* pattern)
+void PxEngine::addPatternToMatch(PxPattern* pattern)
 {
 	pxPatterns.push_back(pattern);
 }

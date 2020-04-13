@@ -1,6 +1,7 @@
 #pragma once 
 
-#include "PatternsBase.h"
+#include "PxPatternInterface.h"
+#include "PxTypes.h"
 
 class InitializedEngine
 {
@@ -15,7 +16,7 @@ class UnInitializedEngine
 {
 public:
 	virtual UnInitializedEngine* setConfigs(Config params) = 0;
-	virtual UnInitializedEngine* addPatternToMatch(PxPatternBase* pattern) = 0;
+	virtual UnInitializedEngine* addPatternToMatch(PxPattern* pattern) = 0;
 	virtual InitializedEngine* initGameMap() = 0;
 };
 
