@@ -92,31 +92,6 @@ void PxEngine::resetDifferedBackground(PxPos position)
 }
 
 
-void PxEngine::swapPawnsAndMatch(const PxPos firstPos, const PxPos secondPos)
-{
-	if (!isMovementPossible(firstPos, secondPos))
-		return;
-
-	swapTextures(fieldPointMap[firstPos].pawn, fieldPointMap[secondPos].pawn);
-
-	for (auto pxPat : pxPatterns)
-	{
-		auto points = pxPat->match(fieldPointMap, firstPos);
-		auto points2 = pxPat->match(fieldPointMap, secondPos);
-
-		points.insert(points2.begin(), points2.end());
-
-		if (points.size())
-		{
-			pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
-		}
-		else
-		{
-			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos); // re-swap figures
-		}
-	}
-}
-
 void PxEngine::swapTextures(sf::Sprite* lhs, sf::Sprite* rhs)
 {
 	const sf::Texture* temp = lhs->getTexture();
@@ -152,8 +127,6 @@ void PxEngine::drawMap(sf::RenderWindow* app)
 			}
 		}
 	}
-	
-
 };
 
 void PxEngine::dropDownPawns(PxPos position)
@@ -191,4 +164,30 @@ bool PxEngine::isMovementPossible(const PxPos p1, const PxPos p2)
 		return true;
 
 	return false;
+}
+
+
+void PxEngine::swapAndMatchThreeInSequence(PxPos firstPos, PxPos secondPos)
+{
+	if (!isMovementPossible(firstPos, secondPos))
+		return;
+
+	swapTextures(fieldPointMap[firstPos].pawn, fieldPointMap[secondPos].pawn);
+
+	for (auto pxPat : pxPatterns)
+	{
+		auto points = pxPat->match(fieldPointMap, firstPos);
+		auto points2 = pxPat->match(fieldPointMap, secondPos);
+
+		points.insert(points2.begin(), points2.end());
+
+		if (points.size())
+		{
+			pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
+		}
+		else
+		{
+			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos); // re-swap figures
+		}
+	}
 }

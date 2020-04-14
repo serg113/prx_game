@@ -1,6 +1,7 @@
 #include "PxMatchGameFacade.h"
 #include "PxEngine.h"
 
+#include <iostream>
 
 PxMatchGameFacade::PxMatchGameFacade()
 {
@@ -44,7 +45,12 @@ InitializedEngine* PxMatchGameFacade::resetDifferedBackground(PxPos position)
 
 InitializedEngine* PxMatchGameFacade::draw(sf::RenderWindow* app)
 {
-	engine->drawMap(app);
+	Drawable* ptrDrawableEngine = dynamic_cast<Drawable*>(engine);
+
+	if (ptrDrawableEngine == nullptr)
+		std::cout << "[cast error] Engine is not Drawable" << std::endl;
+	else
+		ptrDrawableEngine->drawMap(app);
 
 	return this;
 }
@@ -52,7 +58,12 @@ InitializedEngine* PxMatchGameFacade::draw(sf::RenderWindow* app)
 
 InitializedEngine* PxMatchGameFacade::swapPawnsAndMatch(PxPos firstPos, PxPos secondPos)
 {
-	engine->swapPawnsAndMatch(firstPos, secondPos);
+	PatternMatchable* ptrMatchableEngine = dynamic_cast<PatternMatchable*>(engine);
+
+	if (ptrMatchableEngine == nullptr)
+		std::cout << "[cast error] Engine is not PatternMatchable" << std::endl;
+	else
+		ptrMatchableEngine->swapAndMatchThreeInSequence(firstPos, secondPos);
 
 	return this;
 }

@@ -7,23 +7,24 @@
 #include <map>
 
 
-class PxEngine : public PxEngineInterface
+class PxEngine : public PxEngineInterface, public Drawable, public PatternMatchable
 {
 public:
 	PxEngine();
 	// initialization of engine
-	void setConfigs(Config params);
-	void addPatternToMatch(PxPattern* pattern);
+	void setConfigs(Config params) override;
+	void addPatternToMatch(PxPattern* pattern) override;
 	void initGameMap();
-	// after this step, initialization ends, and board map ready to play 
 
 	// engine basic functionality
-	void swapPawnsAndMatch(const PxPos firstPos, const PxPos secondPos);
-	void setDifferedBackground(PxPos position, sf::Texture* txt);
-	void resetDifferedBackground(PxPos position);
+	void setDifferedBackground(PxPos position, sf::Texture* txt) override;
+	void resetDifferedBackground(PxPos position) override;
 
-	// draw ui
-	void drawMap(sf::RenderWindow* app);
+	// drawable
+	void drawMap(sf::RenderWindow* app) override;
+
+	// PatternMatchable
+	void swapAndMatchThreeInSequence(PxPos firstPos, PxPos secondPos) override;
 
 private:
 	void swapTextures(sf::Sprite*, sf::Sprite*);
