@@ -3,7 +3,6 @@
 
 #include "ConfigParser.h"
 #include "PxMatchGameInterface.h"
-#include "PxPattern.h"
 
 #include <string>
 #include <vector>
@@ -23,7 +22,7 @@ void GameController::updateGameStatus(GameStatus &status) {
 
 void GameController::startGame() {
     _app = new RenderWindow(VideoMode(1080, 744), "Game", Style::Close);
-    _app->setFramerateLimit(60);
+    _app->setFramerateLimit(10);
     run();
 }
 
@@ -31,17 +30,6 @@ void GameController::startGame() {
 void GameController::run() {
 	
 	initConfig();
-
-	Texture bgTxt1, bgTxt2, bgTxt3, redTxt, greenTxt, blueTxt, violetTxt;
-
-	bgTxt1 = getTexture(TileType::BackGroundType1);
-	bgTxt2 = getTexture(TileType::BackGroundType2);
-	bgTxt3 = getTexture(TileType::BackGroundType3);
-	
-	redTxt = getTexture(TileType::RedPawn);
-	greenTxt = getTexture(TileType::GreenPawn);
-	blueTxt = getTexture(TileType::BluePawn);
-	violetTxt = getTexture(TileType::VioletPawn);
 
 	// init config to pass into engine
 	Config initParams;
@@ -52,17 +40,22 @@ void GameController::run() {
 	initParams.columnCount = getColumnCount();
 	initParams.bgTileSize = getBgTileSize();
 	initParams.figureSize = getPawnSize();
-	initParams.backgroundTxts = { &bgTxt1, &bgTxt2, &bgTxt3 };
-	initParams.figureTxts = { &redTxt, &greenTxt, &blueTxt, &violetTxt };
+
+	initParams.backgroundTxts = { 
+		getTexture(TileType::BackGroundType1), 
+		getTexture(TileType::BackGroundType2), 
+		getTexture(TileType::BackGroundType3) 
+	};
+
+	initParams.figureTxts = { 
+		getTexture(TileType::RedPawn), 
+		getTexture(TileType::GreenPawn), 
+		getTexture(TileType::BluePawn), 
+		getTexture(TileType::VioletPawn) 
+	};
 
 
-	MatchThreeInDirectionXY matchDxy;
-
-	auto engine = getEngine()
-		->setConfigs(initParams)
-		->addPatternToMatch(&matchDxy)
-		->initGameMap();
-
+	auto engine = createEngine(initParams);
 
 	PxPos prevPosition;
 	bool isPrevPosValid = false;
@@ -94,7 +87,7 @@ void GameController::run() {
 
 					if (isPrevPosValid)
 					{
-						engine->swapPawnsAndMatch(prevPosition, currentPosition)
+						engine->swapFigures(prevPosition, currentPosition)
 							->resetDifferedBackground(prevPosition);
 
 						isPrevPosValid = false;
@@ -103,7 +96,7 @@ void GameController::run() {
 					{
 						prevPosition = currentPosition;
 
-						engine->setDifferedBackground(prevPosition, &bgTxt3);
+						engine->setDifferedBackground(prevPosition);
 
 						isPrevPosValid = true;
 

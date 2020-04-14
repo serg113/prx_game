@@ -12,19 +12,18 @@ class PxEngine : public PxEngineInterface, public Drawable, public PatternMatcha
 public:
 	PxEngine();
 	// initialization of engine
-	void setConfigs(Config params) override;
-	void addPatternToMatch(PxPattern* pattern) override;
+	void setConfig(const Config& params) override;
 	void initGameMap();
 
-	// engine basic functionality
-	void setDifferedBackground(PxPos position, sf::Texture* txt) override;
+	// engine functionality
+	void setDifferedBackground(PxPos position) override;
 	void resetDifferedBackground(PxPos position) override;
 
 	// drawable
 	void drawMap(sf::RenderWindow* app) override;
 
 	// PatternMatchable
-	void swapAndMatchThreeInSequence(PxPos firstPos, PxPos secondPos) override;
+	void swapAndMatch(PxPos firstPos, PxPos secondPos) override;
 
 private:
 	void swapTextures(sf::Sprite*, sf::Sprite*);
@@ -38,6 +37,6 @@ private:
 	Config params;
 
 	std::map<PxPos, PxFieldPoint> fieldPointMap;
-	std::vector<const PxPattern*> pxPatterns;
+	std::vector<PxPattern*> enginePatterns;
 
 };

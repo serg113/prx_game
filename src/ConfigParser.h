@@ -33,6 +33,6 @@ struct Pos
 
 Pos getPositionByCoordinates(int x, int y);
 
-sf::Texture getTexture(TileType tType);
+sf::Texture* getTexture(TileType tType);
 
 

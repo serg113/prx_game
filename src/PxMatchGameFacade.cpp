@@ -8,16 +8,9 @@ PxMatchGameFacade::PxMatchGameFacade()
 	engine = new PxEngine();
 }
 
-UnInitializedEngine* PxMatchGameFacade::setConfigs(Config params)
+UnInitializedEngine* PxMatchGameFacade::setConfig(const Config& params)
 {
-	engine->setConfigs(params);
-
-	return this;
-}
-
-UnInitializedEngine* PxMatchGameFacade::addPatternToMatch(PxPattern* pattern)
-{
-	engine->addPatternToMatch(pattern);
+	engine->setConfig(params);
 
 	return this;
 }
@@ -29,9 +22,9 @@ InitializedEngine* PxMatchGameFacade::initGameMap()
 	return this;
 }
 
-InitializedEngine* PxMatchGameFacade::setDifferedBackground(PxPos position, sf::Texture* txt)
+InitializedEngine* PxMatchGameFacade::setDifferedBackground(PxPos position)
 {
-	engine->setDifferedBackground(position, txt);
+	engine->setDifferedBackground(position);
 
 	return this;
 }
@@ -47,23 +40,23 @@ InitializedEngine* PxMatchGameFacade::draw(sf::RenderWindow* app)
 {
 	Drawable* ptrDrawableEngine = dynamic_cast<Drawable*>(engine);
 
-	if (ptrDrawableEngine == nullptr)
-		std::cout << "[cast error] Engine is not Drawable" << std::endl;
-	else
+	if (ptrDrawableEngine)
 		ptrDrawableEngine->drawMap(app);
+	else
+		std::cout << "[cast failed] Engine is not Drawable" << std::endl;
 
 	return this;
 }
 
 
-InitializedEngine* PxMatchGameFacade::swapPawnsAndMatch(PxPos firstPos, PxPos secondPos)
+InitializedEngine* PxMatchGameFacade::swapFigures(PxPos firstPos, PxPos secondPos)
 {
 	PatternMatchable* ptrMatchableEngine = dynamic_cast<PatternMatchable*>(engine);
 
-	if (ptrMatchableEngine == nullptr)
-		std::cout << "[cast error] Engine is not PatternMatchable" << std::endl;
+	if (ptrMatchableEngine)
+		ptrMatchableEngine->swapAndMatch(firstPos, secondPos);
 	else
-		ptrMatchableEngine->swapAndMatchThreeInSequence(firstPos, secondPos);
+		std::cout << "[cast failed] Engine is not PatternMatchable" << std::endl;
 
 	return this;
 }

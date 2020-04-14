@@ -2,7 +2,7 @@
 #include "PxMatchGameInterface.h"
 #include "PxMatchGameFacade.h"
 
-UnInitializedEngine* getEngine() 
+InitializedEngine* initEngine(const Config& options)
 {
-	return new PxMatchGameFacade();
+	return (new PxMatchGameFacade())->setConfig(options)->initGameMap();
 }

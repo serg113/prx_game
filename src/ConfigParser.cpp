@@ -46,11 +46,11 @@ void initConfig()
 }
 
 
-sf::Texture getTexture(TileType tType)
+sf::Texture* getTexture(TileType tType)
 {
-	sf::Texture txt;
+	auto txt = new sf::Texture();
 
-	if (!txt.loadFromFile(tileImgSrc[tType]))
+	if (!txt->loadFromFile(tileImgSrc[tType]))
 		throw std::exception("[config error] cannot load texture from source: /src/");
 
 	return txt;

@@ -1,14 +1,19 @@
 #include "PxEngine.h"
 
+#include "PxPattern.h"
+
 #include <exception>
 #include <iostream>
 #include <cmath>
 #include <random>
 
 
-PxEngine::PxEngine() {};
+PxEngine::PxEngine() 
+{
+	enginePatterns.push_back(new MatchThreeInDirectionXY());
+};
 
-void PxEngine::setConfigs(Config params)
+void PxEngine::setConfig(const Config& params)
 {
 	this->params = params;
 }
@@ -41,8 +46,8 @@ void PxEngine::initGameMap()
 
 bool PxEngine::checkPatternMatched(PxPos pos) const
 {
-	for (auto pxPat : pxPatterns)
-		if (pxPat->match(fieldPointMap, pos).size())
+	for (auto pattern : enginePatterns)
+		if (pattern->match(fieldPointMap, pos).size())
 			return true;
 	
 	return false;
@@ -73,17 +78,11 @@ sf::Sprite* PxEngine::getBackgroundSprite(size_t X, size_t Y, bool isEven) const
 }
 
 
-void PxEngine::addPatternToMatch(PxPattern* pattern)
-{
-	pxPatterns.push_back(pattern);
-}
-
-
-void PxEngine::setDifferedBackground(PxPos position, sf::Texture* txt)
+void PxEngine::setDifferedBackground(PxPos position)
 {
 	fieldPointMap[position].bgTxt = fieldPointMap[position].bgTile->getTexture();
 
-	fieldPointMap[position].bgTile->setTexture(*txt);
+	fieldPointMap[position].bgTile->setTexture(*params.backgroundTxts[2]);
 }
 
 void PxEngine::resetDifferedBackground(PxPos position)
@@ -118,12 +117,12 @@ void PxEngine::drawMap(sf::RenderWindow* app)
 		{
 			dropDownPawns(point.first);
 
-			for (auto pxPat : pxPatterns)
+			for (auto& pattern : enginePatterns)
 			{
-				auto points = pxPat->match(fieldPointMap, point.first);
+				auto points = pattern->match(fieldPointMap, point.first);
 
 				if (points.size())
-					pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
+					pattern->actOnSuccess(fieldPointMap, points); // erise figures 
 			}
 		}
 	}
@@ -167,27 +166,27 @@ bool PxEngine::isMovementPossible(const PxPos p1, const PxPos p2)
 }
 
 
-void PxEngine::swapAndMatchThreeInSequence(PxPos firstPos, PxPos secondPos)
+void PxEngine::swapAndMatch(PxPos firstPos, PxPos secondPos)
 {
 	if (!isMovementPossible(firstPos, secondPos))
 		return;
 
 	swapTextures(fieldPointMap[firstPos].pawn, fieldPointMap[secondPos].pawn);
 
-	for (auto pxPat : pxPatterns)
+	for (auto& pattern : enginePatterns)
 	{
-		auto points = pxPat->match(fieldPointMap, firstPos);
-		auto points2 = pxPat->match(fieldPointMap, secondPos);
+		auto points = pattern->match(fieldPointMap, firstPos);
+		auto points2 = pattern->match(fieldPointMap, secondPos);
 
 		points.insert(points2.begin(), points2.end());
 
 		if (points.size())
 		{
-			pxPat->actOnSuccess(fieldPointMap, points); // erise figures 
+			pattern->actOnSuccess(fieldPointMap, points); // erise figures 
 		}
 		else
 		{
-			pxPat->actOnFailure(fieldPointMap, firstPos, secondPos); // re-swap figures
+			pattern->actOnFailure(fieldPointMap, firstPos, secondPos); // re-swap figures
 		}
 	}
 }
