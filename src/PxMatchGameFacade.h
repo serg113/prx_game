@@ -13,9 +13,9 @@ public:
 	InitializedEngine* initGameMap() override;
 
 	// basic functionality of engine
-	InitializedEngine* swapFigures(PxPos pos1, PxPos pos2) override;
-	InitializedEngine* setDifferedBackground(PxPos position) override;
-	InitializedEngine* resetDifferedBackground(PxPos position) override;
+	InitializedEngine* swapFigures(PxPoint pos1, PxPoint pos2) override;
+	InitializedEngine* setPositionIsChecked(PxPoint position) override;
+	InitializedEngine* setPositionUnChecked(PxPoint position) override;
 
 	// draw ui
 	InitializedEngine* draw(sf::RenderWindow* app) override;

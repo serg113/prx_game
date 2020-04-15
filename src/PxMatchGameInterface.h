@@ -7,9 +7,9 @@ class InitializedEngine
 {
 public:
 	virtual InitializedEngine* draw(sf::RenderWindow* app) = 0;
-	virtual InitializedEngine* swapFigures(PxPos pos1, PxPos pos2) = 0;
-	virtual InitializedEngine* setDifferedBackground(PxPos position) = 0;
-	virtual InitializedEngine* resetDifferedBackground(PxPos position) = 0;
+	virtual InitializedEngine* swapFigures(PxPoint pos1, PxPoint pos2) = 0;
+	virtual InitializedEngine* setPositionIsChecked(PxPoint position) = 0;
+	virtual InitializedEngine* setPositionUnChecked(PxPoint position) = 0;
 };
 
 class UnInitializedEngine

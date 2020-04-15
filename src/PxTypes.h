@@ -16,29 +16,28 @@ struct Config
 	size_t columnCount;
 	size_t bgTileSize;
 	size_t figureSize;
-
 };
 
 /* coordinate of field positions represented by row and column numbers */
-class PxPos
+class PxPoint
 {
 public:
-	PxPos();
-	PxPos(size_t x, size_t y);
+	PxPoint();
+	PxPoint(size_t x, size_t y);
 	size_t X;
 	size_t Y;
 };
 
-bool operator<(const PxPos& lhs, const PxPos& rhs);
+bool operator<(const PxPoint& lhs, const PxPoint& rhs);
 
 
 /* represents one square field of board
  * with background and foreground (figure or pawn)
  */
-struct PxFieldPoint
+struct PxField
 {
-	PxFieldPoint() = default;
-	PxFieldPoint(sf::Sprite* back, sf::Sprite* front);
+	PxField() = default;
+	PxField(sf::Sprite* back, sf::Sprite* front);
 
 	sf::Sprite* bgTile;
 	const sf::Texture* bgTxt;

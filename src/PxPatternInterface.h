@@ -10,14 +10,15 @@
 /* abstract base class for any pattern acceptable by engine */
 class PxPattern
 {
+
 public:
-	/* returns matching positions according to pattern combined for two swapped points */
-	virtual std::set<PxPos> match(const std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position) const = 0;
+	/* returns a set of matching points according to pattern */
+	virtual std::set<PxPoint> match(const std::map<PxPoint, PxField>& fieldMap, PxPoint point) const = 0;
 
-	/* action that need to be performed if match() returns not empty set */
-	virtual void actOnSuccess(std::map<PxPos, PxFieldPoint>& fieldMap, std::set<PxPos>& points) const = 0;
+	/* action that need to be performed if match points set */
+	virtual void actOnSuccess(std::map<PxPoint, PxField>& fieldMap, std::set<PxPoint>& matchPoints) const = 0;
 
-	/* action that need to be performed if match() returns empty set */
-	virtual void actOnFailure(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const = 0;
+	/* action that need to be performed if matching points set is empty */
+	virtual void actOnFailure(std::map<PxPoint, PxField>& fieldMap, PxPoint point1, PxPoint point2) const = 0;
 };
 

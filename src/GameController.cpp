@@ -32,22 +32,22 @@ void GameController::run() {
 	initConfig();
 
 	// init config to pass into engine
-	Config initParams;
+	Config params;
 
-	initParams.boardStartPosX = getStartPosX();
-	initParams.boardStartPosY = getStartPosY();
-	initParams.rowCount = getRowCount();
-	initParams.columnCount = getColumnCount();
-	initParams.bgTileSize = getBgTileSize();
-	initParams.figureSize = getPawnSize();
+	params.boardStartPosX = getStartPosX();
+	params.boardStartPosY = getStartPosY();
+	params.rowCount = getRowCount();
+	params.columnCount = getColumnCount();
+	params.bgTileSize = getBgTileSize();
+	params.figureSize = getPawnSize();
 
-	initParams.backgroundTxts = { 
+	params.backgroundTxts = {
 		getTexture(TileType::BackGroundType1), 
 		getTexture(TileType::BackGroundType2), 
 		getTexture(TileType::BackGroundType3) 
 	};
 
-	initParams.figureTxts = { 
+	params.figureTxts = {
 		getTexture(TileType::RedPawn), 
 		getTexture(TileType::GreenPawn), 
 		getTexture(TileType::BluePawn), 
@@ -55,9 +55,9 @@ void GameController::run() {
 	};
 
 
-	auto engine = createEngine(initParams);
+	auto engine = initEngine(params);
 
-	PxPos prevPosition;
+	PxPoint prevPosition;
 	bool isPrevPosValid = false;
     
 	while (_app->isOpen()) {
@@ -77,18 +77,18 @@ void GameController::run() {
 
 				if (!point.isValid)
 				{
-					engine->resetDifferedBackground(prevPosition);
+					engine->setPositionUnChecked(prevPosition);
 
 					isPrevPosValid = false;
 				}
 				else
 				{
-					PxPos currentPosition(point.X, point.Y);
+					PxPoint currentPosition(point.X, point.Y);
 
 					if (isPrevPosValid)
 					{
 						engine->swapFigures(prevPosition, currentPosition)
-							->resetDifferedBackground(prevPosition);
+							->setPositionUnChecked(prevPosition);
 
 						isPrevPosValid = false;
 					}
@@ -96,7 +96,7 @@ void GameController::run() {
 					{
 						prevPosition = currentPosition;
 
-						engine->setDifferedBackground(prevPosition);
+						engine->setPositionIsChecked(prevPosition);
 
 						isPrevPosValid = true;
 

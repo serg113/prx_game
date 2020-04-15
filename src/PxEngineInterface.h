@@ -14,7 +14,7 @@ public:
 class PatternMatchable
 {
 public:
-	virtual void swapAndMatch(PxPos firstPos, PxPos secondPos) = 0;
+	virtual void swapAndMatch(PxPoint firstPos, PxPoint secondPos) = 0;
 };
 
 /* abstract base class for engine */
@@ -24,7 +24,7 @@ public:
 	virtual void setConfig(const Config& params) = 0;
 	virtual void initGameMap() = 0;
 
-	virtual void setDifferedBackground(PxPos position) = 0;
-	virtual void resetDifferedBackground(PxPos position) = 0;
+	virtual void setPositionIsChecked(PxPoint position) = 0;
+	virtual void setPositionUnChecked(PxPoint position) = 0;
 };
 

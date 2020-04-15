@@ -1,12 +1,12 @@
-#include "PxPattern.h"
+#include "PxPatterns.h"
 
 #include <iostream>
 #include <set>
 
 
-std::set<PxPos> MatchThreeInDirectionXY::match(const std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position) const
+std::set<PxPoint> MatchThreeInDirectionXY::match(const std::map<PxPoint, PxField>& fieldMap, PxPoint position) const
 {
-	std::set<PxPos> matchPoints;
+	std::set<PxPoint> matchPoints;
 
 	auto points = matchThreeInSequenceDirectionXY(fieldMap, position);
 
@@ -15,12 +15,12 @@ std::set<PxPos> MatchThreeInDirectionXY::match(const std::map<PxPos, PxFieldPoin
 	return matchPoints;
 }
 
-void MatchThreeInDirectionXY::actOnSuccess(std::map<PxPos, PxFieldPoint>& fieldMap, std::set<PxPos>& points) const
+void MatchThreeInDirectionXY::actOnSuccess(std::map<PxPoint, PxField>& fieldMap, std::set<PxPoint>& points) const
 {
 	deleteMatchingPoints(fieldMap, { points.begin(), points.end() });
 }
 
-void MatchThreeInDirectionXY::actOnFailure(std::map<PxPos, PxFieldPoint>& fieldMap, PxPos position1, PxPos position2) const
+void MatchThreeInDirectionXY::actOnFailure(std::map<PxPoint, PxField>& fieldMap, PxPoint position1, PxPoint position2) const
 {
 	swapTextures(fieldMap[position1].pawn, fieldMap[position2].pawn);
 }
@@ -28,10 +28,10 @@ void MatchThreeInDirectionXY::actOnFailure(std::map<PxPos, PxFieldPoint>& fieldM
 
 
 
-std::vector<PxPos> matchThreeInSequenceDirectionXY(const std::map<PxPos, PxFieldPoint>& fieldPointMap, PxPos position)
+std::vector<PxPoint> matchThreeInSequenceDirectionXY(const std::map<PxPoint, PxField>& fieldPointMap, PxPoint position)
 {
-	std::vector<PxPos> points1 = matchThreeInSequenceDirectionX(fieldPointMap, position);
-	std::vector<PxPos> points2 = matchThreeInSequenceDirectionY(fieldPointMap, position);
+	std::vector<PxPoint> points1 = matchThreeInSequenceDirectionX(fieldPointMap, position);
+	std::vector<PxPoint> points2 = matchThreeInSequenceDirectionY(fieldPointMap, position);
 
 	points1.insert(points1.end(), points2.begin(), points2.end());
 
@@ -39,7 +39,7 @@ std::vector<PxPos> matchThreeInSequenceDirectionXY(const std::map<PxPos, PxField
 }
 
 
-std::vector<PxPos> matchThreeInSequenceDirectionX(const std::map<PxPos, PxFieldPoint>& fPointMap, PxPos position)
+std::vector<PxPoint> matchThreeInSequenceDirectionX(const std::map<PxPoint, PxField>& fPointMap, PxPoint position)
 {
 	auto x = position.X;
 	auto y = position.Y;
@@ -49,22 +49,22 @@ std::vector<PxPos> matchThreeInSequenceDirectionX(const std::map<PxPos, PxFieldP
 	if (fPointMap.find({ x - 1, y }) != fPointMap.end() && fPointMap.at({x - 1, y}).pawn->getTexture() == currentTxt)
 	{
 		if (fPointMap.find({ x - 2, y }) != fPointMap.end() && fPointMap.at({x - 2, y}).pawn->getTexture() == currentTxt)
-			return { PxPos(x,y), PxPos(x - 1,y), PxPos(x - 2,y) };
+			return { PxPoint(x,y), PxPoint(x - 1,y), PxPoint(x - 2,y) };
 
 		if (fPointMap.find({ x + 1, y }) != fPointMap.end() && fPointMap.at({x + 1, y}).pawn->getTexture() == currentTxt)
-			return { PxPos(x,y), PxPos(x - 1,y), PxPos(x + 1,y) };
+			return { PxPoint(x,y), PxPoint(x - 1,y), PxPoint(x + 1,y) };
 	}
 
 	if (fPointMap.find({ x + 1, y }) != fPointMap.end() && fPointMap.at({x + 1, y}).pawn->getTexture() == currentTxt)
 	{
 		if (fPointMap.find({ x + 2, y }) != fPointMap.end() && fPointMap.at({x + 2, y}).pawn->getTexture() == currentTxt)
-			return { PxPos(x,y), PxPos(x + 1,y), PxPos(x + 2,y) };
+			return { PxPoint(x,y), PxPoint(x + 1,y), PxPoint(x + 2,y) };
 	}
 
 	return {};
 }
 
-std::vector<PxPos> matchThreeInSequenceDirectionY(const std::map<PxPos, PxFieldPoint>& fPointMap, PxPos position)
+std::vector<PxPoint> matchThreeInSequenceDirectionY(const std::map<PxPoint, PxField>& fPointMap, PxPoint position)
 {
 	auto x = position.X;
 	auto y = position.Y;
@@ -74,22 +74,22 @@ std::vector<PxPos> matchThreeInSequenceDirectionY(const std::map<PxPos, PxFieldP
 	if (fPointMap.find({ x, y - 1 }) != fPointMap.end() && fPointMap.at({x, y - 1}).pawn->getTexture() == currentTxt)
 	{
 		if (fPointMap.find({ x, y - 2 }) != fPointMap.end() && fPointMap.at({x, y - 2}).pawn->getTexture() == currentTxt)
-			return { PxPos(x,y), PxPos(x,y - 1), PxPos(x,y - 2) };
+			return { PxPoint(x,y), PxPoint(x,y - 1), PxPoint(x,y - 2) };
 
 		if (fPointMap.find({ x, y + 1 }) != fPointMap.end() && fPointMap.at({x, y + 1}).pawn->getTexture() == currentTxt)
-			return { PxPos(x,y), PxPos(x,y - 1), PxPos(x,y + 1) };
+			return { PxPoint(x,y), PxPoint(x,y - 1), PxPoint(x,y + 1) };
 	}
 
 	if (fPointMap.find({ x, y + 1 }) != fPointMap.end() && fPointMap.at({x, y + 1}).pawn->getTexture() == currentTxt)
 	{
 		if (fPointMap.find({ x, y + 2 }) != fPointMap.end() && fPointMap.at({x, y + 2}).pawn->getTexture() == currentTxt)
-			return { PxPos(x,y), PxPos(x,y + 1), PxPos(x,y + 2) };
+			return { PxPoint(x,y), PxPoint(x,y + 1), PxPoint(x,y + 2) };
 	}
 
 	return {};
 }
 
-void deleteMatchingPoints(std::map<PxPos, PxFieldPoint>& fieldPointMap, std::vector<PxPos> matchPoints)
+void deleteMatchingPoints(std::map<PxPoint, PxField>& fieldPointMap, std::vector<PxPoint> matchPoints)
 {
 	std::cout << "deleteMatchingPoints(ponts = " << matchPoints.size() << " )" << std::endl;
 	for (auto point : matchPoints)

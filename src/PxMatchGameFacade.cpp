@@ -22,16 +22,16 @@ InitializedEngine* PxMatchGameFacade::initGameMap()
 	return this;
 }
 
-InitializedEngine* PxMatchGameFacade::setDifferedBackground(PxPos position)
+InitializedEngine* PxMatchGameFacade::setPositionIsChecked(PxPoint position)
 {
-	engine->setDifferedBackground(position);
+	engine->setPositionIsChecked(position);
 
 	return this;
 }
 
-InitializedEngine* PxMatchGameFacade::resetDifferedBackground(PxPos position)
+InitializedEngine* PxMatchGameFacade::setPositionUnChecked(PxPoint position)
 {
-	engine->resetDifferedBackground(position);
+	engine->setPositionUnChecked(position);
 
 	return this;
 }
@@ -49,7 +49,7 @@ InitializedEngine* PxMatchGameFacade::draw(sf::RenderWindow* app)
 }
 
 
-InitializedEngine* PxMatchGameFacade::swapFigures(PxPos firstPos, PxPos secondPos)
+InitializedEngine* PxMatchGameFacade::swapFigures(PxPoint firstPos, PxPoint secondPos)
 {
 	PatternMatchable* ptrMatchableEngine = dynamic_cast<PatternMatchable*>(engine);
 

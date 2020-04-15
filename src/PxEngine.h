@@ -16,27 +16,26 @@ public:
 	void initGameMap();
 
 	// engine functionality
-	void setDifferedBackground(PxPos position) override;
-	void resetDifferedBackground(PxPos position) override;
+	void setPositionIsChecked(PxPoint position) override;
+	void setPositionUnChecked(PxPoint position) override;
 
-	// drawable
+	// Drawable
 	void drawMap(sf::RenderWindow* app) override;
 
 	// PatternMatchable
-	void swapAndMatch(PxPos firstPos, PxPos secondPos) override;
+	void swapAndMatch(PxPoint firstPos, PxPoint secondPos) override;
 
 private:
-	void swapTextures(sf::Sprite*, sf::Sprite*);
-	void dropDownPawns(PxPos position);
-	void resetMovement(PxPos prev, PxPos curr);
-	bool isMovementPossible(const PxPos p1, const PxPos p2);
+	void swapTextures(sf::Sprite*, sf::Sprite*); // move to utility functions
+	void dropDownPawns(PxPoint position);
+	bool isMovementPossible(const PxPoint p1, const PxPoint p2);
 	sf::Sprite* getBackgroundSprite(size_t X, size_t Y, bool isEven) const;
 	sf::Sprite* getForegroundSprite(size_t X, size_t Y) const;
-	bool checkPatternMatched(PxPos pos) const;
+	bool checkPatternMatched(PxPoint pos) const;
 
 	Config params;
 
-	std::map<PxPos, PxFieldPoint> fieldPointMap;
+	std::map<PxPoint, PxField> fieldPointMap;
 	std::vector<PxPattern*> enginePatterns;
 
 };
