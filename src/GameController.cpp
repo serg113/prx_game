@@ -1,8 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include "GameController.hpp"
 
-#include "ConfigParser.h"
-#include "PxMatchGameInterface.h"
+#include "PxConfiguration.h"
+#include "PxMatchGame.h"
 
 #include <string>
 #include <vector>
@@ -22,48 +22,64 @@ void GameController::updateGameStatus(GameStatus &status) {
 
 void GameController::startGame() {
     _app = new RenderWindow(VideoMode(1080, 744), "Game", Style::Close);
-    _app->setFramerateLimit(10);
+    _app->setFramerateLimit(60);
     run();
 }
 
+struct Pos
+{
+	size_t X;
+	size_t Y;
+	bool isValid;
+};
 
-void GameController::run() {
+Pos getPositionByCoordinates(int x, int y)
+{
+	Pos position;
+
+	if (x > 100 && y > 100)
+		position.isValid = true;
+	else
+		position.isValid = false;
+
+	position.X = static_cast<size_t>((x - 100) / 87);
+	position.Y = static_cast<size_t>((y - 100) / 87);
+
+	return position;
+}
+
+
+void GameController::run() 
+{
+	/*
+		Board row/column size. (min 7, max 10)
+		Moves count.
+		Objectives count (max 3) their colors and values. i.e. 10 red, 12 green, 20 blue.
+		Figures colors count. (min 3, max 5)
+
+	*/
 	
-	initConfig();
+	// config comes from server in json format
 
-	// init config to pass into engine
-	Config params;
+	std::string configString = "{"
+		"boardSize:7,"
+		"moveCount:5,"
+		"objectives:[{red:10,green:12,blue:20}]"
+		"figureColorCount:5"
+		"}";
 
-	params.boardStartPosX = getStartPosX();
-	params.boardStartPosY = getStartPosY();
-	params.rowCount = getRowCount();
-	params.columnCount = getColumnCount();
-	params.bgTileSize = getBgTileSize();
-	params.figureSize = getPawnSize();
+	// issue 1, choose json library to parse config string 
 
-	params.backgroundTxts = {
-		getTexture(TileType::BackGroundType1), 
-		getTexture(TileType::BackGroundType2), 
-		getTexture(TileType::BackGroundType3) 
-	};
+	mapJson configJson = { { "boardSize",7 }, {"moveCount",5},{"figureColorCount",5} };
 
-	params.figureTxts = {
-		getTexture(TileType::RedPawn), 
-		getTexture(TileType::GreenPawn), 
-		getTexture(TileType::BluePawn), 
-		getTexture(TileType::VioletPawn) 
-	};
+	PxConfiguration options(configJson);
 
-
-	auto engine = initEngine(params);
-
-	PxPoint prevPosition;
-	bool isPrevPosValid = false;
+	auto matchGame = createGame(options);
     
 	while (_app->isOpen()) {
         _app->clear(Color(150, 250, 150, 255));
 		
-		engine->draw(_app);
+		matchGame->draw(_app);
 		
         sf::Event event;
         while (_app->pollEvent(event)) {
@@ -73,61 +89,11 @@ void GameController::run() {
 
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				auto point = getPositionByCoordinates(event.mouseButton.x, event.mouseButton.y);
-
-				if (!point.isValid)
-				{
-					engine->setPositionUnChecked(prevPosition);
-
-					isPrevPosValid = false;
-				}
-				else
-				{
-					PxPoint currentPosition(point.X, point.Y);
-
-					if (isPrevPosValid)
-					{
-						engine->swapFigures(prevPosition, currentPosition)
-							->setPositionUnChecked(prevPosition);
-
-						isPrevPosValid = false;
-					}
-					else
-					{
-						prevPosition = currentPosition;
-
-						engine->setPositionIsChecked(prevPosition);
-
-						isPrevPosValid = true;
-
-					}
-
-				}
-
-				
+				matchGame->touch(event.mouseButton.x, event.mouseButton.y);
+	
 			}
 			
         }
         _app->display();
     }
 }
-
-
-/*
-std::string resFolder = "C:/Users/Sergey/Documents/_cpp/playrix/DevTestGame-master/resources/";
-
-	sf::Font font;
-	if (!font.loadFromFile(resFolder + "STENCIL.TTF"))
-	{
-		std::cout << "error occured during reading fonts" << std::endl;
-	}
-
-	sf::Text text;
-	text.setFont(font);
-	text.setString("Keep  calm  and  hello  world");
-	text.setCharacterSize(32);
-	text.setFillColor(sf::Color::Black);
-	text.setStyle(sf::Text::Underlined);
-
-	_app->draw(text);
-*/
