@@ -5,16 +5,6 @@
 #include <assert.h> 
 
 
-//---------- external part ----------
-
-InitializedGame* createGame(const PxConfiguration options)
-{
-	return (new PxMatchGame(options))->init();
-}
-
-// -----------------------------------
-
-
 PxMatchGame::PxMatchGame(const PxConfiguration options) : opt(options) { };
 
 InitializedGame* PxMatchGame::init()
@@ -25,7 +15,7 @@ InitializedGame* PxMatchGame::init()
 	return this;
 }
 
-InitializedGame* PxMatchGame::draw(sf::RenderWindow* app)
+InitializedGame* PxMatchGame::draw(sf::RenderTarget* app)
 {
 	auto field = fields.begin();
 
@@ -54,24 +44,21 @@ InitializedGame* PxMatchGame::draw(sf::RenderWindow* app)
 
 InitializedGame* PxMatchGame::touch(int x, int y)
 {
-	if (!positionIsOnBoard(x, y)) {
-		unCheckField(currentIndex);
-	}
-	else {
-		size_t touchIndex = positionToIndex(x, y);
-
-		if (isCurrrentIndexValid && fieldIsChecked(currentIndex))
+	if (positionIsOnBoard(x, y))
+	{
+		if (indexIsValid(currentIndex) && fieldIsChecked(currentIndex))
 		{
-			std::cout << "field is checked" << std::endl;
 			unCheckField(currentIndex);
-			swapAndMatch(currentIndex, touchIndex);
+			swapAndMatch(currentIndex, positionToIndex(x, y));
 		}
-		else {
-			std::cout << "field is not checked" << std::endl;
-			checkField(touchIndex);
-			isCurrrentIndexValid = true;
-			currentIndex = touchIndex;
+		else
+		{
+			checkField(positionToIndex(x, y));
 		}
+	}
+	else if (indexIsValid(currentIndex))
+	{
+		unCheckField(currentIndex);
 	}
 	return this;
 }
@@ -89,7 +76,7 @@ void PxMatchGame::initGameMap()
 			size_t posX = opt.boardStartX() + opt.fieldSize() * i; // column
 			size_t posY = opt.boardStartY() + opt.fieldSize() * j; // row
 
-			PxyField field;
+			PxField field;
 
 			field.back = createBack(posX, posY, (i + j) % 2);
 
@@ -136,27 +123,24 @@ void PxMatchGame::swapAndMatch(size_t lhsIndex, size_t rhsIndex)
 {
 	swapFigures(lhsIndex, rhsIndex);
 
-	auto fields1 = matchThreeXY(lhsIndex);
+	auto fields = matchThreeXY(lhsIndex);
 	auto fields2 = matchThreeXY(rhsIndex);
 
-	fields1.insert(fields2.begin(), fields2.end());
+	fields.insert(fields2.begin(), fields2.end());
 
-	if (fields1.size() > 0)
-	{
-		std::cout << "matching after swap" << std::endl;
-		onMatchingThreeXY(fields1);
-	}
+	if (fields.size())
+		onMatchingThreeXY(fields);
 	else
 		swapFigures(lhsIndex, rhsIndex);
 }
 
 
 void PxMatchGame::swapFigures(size_t lhs, size_t rhs)
-{
-	PxyField temp;
-
-	temp.isFrontVisible = fields[lhs].isFrontVisible;
+{	
+	PxField temp;
+	
 	temp.tempTxt = fields[lhs].front->getTexture();
+	temp.isFrontVisible = fields[lhs].isFrontVisible;
 	temp.frontIndex = fields[lhs].frontIndex;
 
 	fields[lhs].front->setTexture(*fields[rhs].front->getTexture(), true);
@@ -184,8 +168,7 @@ bool PxMatchGame::positionIsOnBoard(int x, int y) const
 	return false;
 }
 
-// before call to this function if position on board need to checked
-// otherwise result will be not correct index
+// ensure positionIsOnBoard(x, y) == true before this call
 size_t PxMatchGame::positionToIndex(int x, int y) const
 {
 	size_t column = (x - opt.boardStartX()) / opt.fieldSize();
@@ -195,6 +178,12 @@ size_t PxMatchGame::positionToIndex(int x, int y) const
 
 	return column * opt.boardSize() + row;
 }
+
+bool PxMatchGame::indexIsValid(size_t index) const
+{
+	return index < fields.size();
+}
+
 
 
 std::set<size_t> PxMatchGame::matchThreeXY(size_t index) const
@@ -252,30 +241,29 @@ void PxMatchGame::onMatchingThreeXY(const std::set<size_t>& indices)
 {
 	for (auto index : indices)
 	{
-		assert(fields.size() >= index);
 		fields[index].isFrontVisible = false;
 	}
 }
 
-
+// ensure indexIsValid(index) == true before this call
 void PxMatchGame::checkField(size_t index)
 {
-	if (index >= fields.size())
-		std::cout << "checkField()" << std::endl;
-
-
 	fields[index].tempTxt = fields[index].back->getTexture();
 	fields[index].back->setTexture(*opt.backgroundTexture(2), true);
 	fields[index].isChecked = true;
+
+	currentIndex = index;
 }
 
+// ensure indexIsValid(index) == true before this call
 void PxMatchGame::unCheckField(size_t index)
 {
 	fields[index].back->setTexture(*fields[index].tempTxt, true);
 	fields[index].isChecked = false;
 }
 
-bool PxMatchGame::fieldIsChecked(size_t index)
+// ensure indexIsValid(index) == true before this call
+bool PxMatchGame::fieldIsChecked(size_t index) const
 {
 	return fields[index].isChecked;
 }
