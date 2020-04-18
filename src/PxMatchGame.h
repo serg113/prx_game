@@ -33,7 +33,7 @@ public:
 private:
 
 	void initGameMap();
-	void dropDown(int index);
+	void dropDown(size_t index);
 	void swapAndMatch(size_t lhsIndex, size_t rhsIndex);
 	void swapFigures(size_t lhsIndex, size_t rhsIndex);
 
@@ -53,6 +53,7 @@ private:
 	sf::Sprite* createBack(size_t X, size_t Y, size_t index) const;
 	sf::Sprite* createFront(size_t X, size_t Y, size_t index) const;
 
+	size_t fieldDistance(size_t lhsIndex, size_t rhsIndex) const;
 	size_t fieldRow(size_t index) const;
 	size_t fieldColumn(size_t index) const;
 	int addRow(size_t index) const;

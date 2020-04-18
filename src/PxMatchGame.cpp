@@ -44,19 +44,21 @@ InitializedGame* PxMatchGame::draw(sf::RenderTarget* app)
 
 InitializedGame* PxMatchGame::touch(int x, int y)
 {
-	if (positionIsOnBoard(x, y))
+	size_t index = positionToIndex(x, y);
+
+	if (indexIsValid(index))
 	{
-		if (indexIsValid(currentIndex) && fieldIsChecked(currentIndex))
+		if (fieldIsChecked(currentIndex))
 		{
 			unCheckField(currentIndex);
-			swapAndMatch(currentIndex, positionToIndex(x, y));
+			swapAndMatch(currentIndex, index);
 		}
 		else
 		{
-			checkField(positionToIndex(x, y));
+			checkField(index);
 		}
 	}
-	else if (indexIsValid(currentIndex))
+	else
 	{
 		unCheckField(currentIndex);
 	}
@@ -66,8 +68,6 @@ InitializedGame* PxMatchGame::touch(int x, int y)
 void PxMatchGame::initGameMap()
 {
 	std::random_device rd;
-
-	size_t txtIndex;
 
 	for (int i = 0; i < opt.boardSize(); ++i)
 	{
@@ -82,7 +82,7 @@ void PxMatchGame::initGameMap()
 
 			while (true)
 			{
-				txtIndex = rd() % opt.figureColorCount();
+				int txtIndex = rd() % opt.figureColorCount();
 
 				field.front = createFront(posX, posY, txtIndex);
 
@@ -99,7 +99,7 @@ void PxMatchGame::initGameMap()
 	}
 }
 
-void PxMatchGame::dropDown(int index)
+void PxMatchGame::dropDown(size_t index)
 {
 	if (fieldRow(index) > 0)
 	{
@@ -109,7 +109,7 @@ void PxMatchGame::dropDown(int index)
 	{
 		std::random_device rd;
 
-		size_t indexTxt = rd() % opt.figureColorCount();
+		int indexTxt = rd() % opt.figureColorCount();
 
 		fields[index].front->setTexture(*opt.foregroundTexture(indexTxt), true);
 
@@ -121,6 +121,9 @@ void PxMatchGame::dropDown(int index)
 
 void PxMatchGame::swapAndMatch(size_t lhsIndex, size_t rhsIndex)
 {
+	if (fieldDistance(lhsIndex, rhsIndex) != 1)
+		return;
+
 	swapFigures(lhsIndex, rhsIndex);
 
 	auto fields = matchThreeXY(lhsIndex);
@@ -137,6 +140,8 @@ void PxMatchGame::swapAndMatch(size_t lhsIndex, size_t rhsIndex)
 
 void PxMatchGame::swapFigures(size_t lhs, size_t rhs)
 {	
+	if (!indexIsValid(lhs) || !indexIsValid(rhs)) return;
+
 	PxField temp;
 	
 	temp.tempTxt = fields[lhs].front->getTexture();
@@ -168,15 +173,25 @@ bool PxMatchGame::positionIsOnBoard(int x, int y) const
 	return false;
 }
 
-// ensure positionIsOnBoard(x, y) == true before this call
 size_t PxMatchGame::positionToIndex(int x, int y) const
 {
-	size_t column = (x - opt.boardStartX()) / opt.fieldSize();
-	size_t row = (y - opt.boardStartY()) / opt.fieldSize();
+	size_t index;
 
-	std::cout << "row: " << row << " column: " << column << std::endl;
+	if (positionIsOnBoard(x, y))
+	{
+		size_t column = static_cast<size_t>((x - opt.boardStartX()) / opt.fieldSize());
+		size_t row = static_cast<size_t>((y - opt.boardStartY()) / opt.fieldSize());
 
-	return column * opt.boardSize() + row;
+		index = column * opt.boardSize() + row;
+	
+		std::cout << "row: " << row << " column: " << column << std::endl;
+	}
+	else
+	{
+		index = fields.size();
+	}
+
+	return index;
 }
 
 bool PxMatchGame::indexIsValid(size_t index) const
@@ -188,6 +203,8 @@ bool PxMatchGame::indexIsValid(size_t index) const
 
 std::set<size_t> PxMatchGame::matchThreeXY(size_t index) const
 {
+	if (!indexIsValid(index)) return {};
+
 	std::set<size_t> matchPoints;
 
 	auto txtIndex = fields[index].frontIndex;
@@ -245,9 +262,11 @@ void PxMatchGame::onMatchingThreeXY(const std::set<size_t>& indices)
 	}
 }
 
-// ensure indexIsValid(index) == true before this call
+
 void PxMatchGame::checkField(size_t index)
 {
+	if (!indexIsValid(index)) return;
+
 	fields[index].tempTxt = fields[index].back->getTexture();
 	fields[index].back->setTexture(*opt.backgroundTexture(2), true);
 	fields[index].isChecked = true;
@@ -255,16 +274,19 @@ void PxMatchGame::checkField(size_t index)
 	currentIndex = index;
 }
 
-// ensure indexIsValid(index) == true before this call
 void PxMatchGame::unCheckField(size_t index)
 {
+	if (!indexIsValid(index)) return;
+
 	fields[index].back->setTexture(*fields[index].tempTxt, true);
 	fields[index].isChecked = false;
 }
 
-// ensure indexIsValid(index) == true before this call
+/*note: returns false if index not valid*/
 bool PxMatchGame::fieldIsChecked(size_t index) const
 {
+	if (!indexIsValid(index)) return false;
+
 	return fields[index].isChecked;
 }
 
@@ -273,14 +295,14 @@ sf::Sprite* PxMatchGame::createBack(size_t X, size_t Y, size_t index) const
 {
 	sf::Sprite* back = new sf::Sprite(*opt.backgroundTexture(index));
 
-	back->setPosition(X, Y);
+	back->setPosition((float)X, (float)Y);
 
 	return back;
 }
 
 sf::Sprite* PxMatchGame::createFront(size_t X, size_t Y, size_t index) const 
 {
-	float offset = (opt.fieldSize() - opt.figureSize()) / 2.0;
+	float offset = (opt.fieldSize() - opt.figureSize()) / 2.f;
 
 	sf::Sprite* front = new sf::Sprite(*opt.foregroundTexture(index));
 
@@ -289,6 +311,12 @@ sf::Sprite* PxMatchGame::createFront(size_t X, size_t Y, size_t index) const
 	return front;
 }
 
+size_t PxMatchGame::fieldDistance(size_t lhsIndex, size_t rhsIndex) const
+{
+	size_t diff = lhsIndex > rhsIndex ? lhsIndex - rhsIndex : rhsIndex - lhsIndex;
+
+	return (diff / opt.boardSize() + diff % opt.boardSize());
+}
 
 size_t PxMatchGame::fieldRow(size_t index) const
 {
