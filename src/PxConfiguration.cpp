@@ -24,6 +24,8 @@ PxConfiguration::PxConfiguration(const mapJson& json): configJson(json)
 		resourceFolder + "orange.png",
 		resourceFolder + "violet.png"
 	};
+
+
 }
 
 const sf::Texture* PxConfiguration::backgroundTexture(size_t index) const
@@ -34,6 +36,16 @@ const sf::Texture* PxConfiguration::backgroundTexture(size_t index) const
 const sf::Texture* PxConfiguration::foregroundTexture(size_t index) const
 {
 	return createTextureFromFile(foregroundImgSrc[index]);
+}
+
+const sf::Font* PxConfiguration::font() const
+{
+	sf::Font* font = new sf::Font;
+
+	if (!font->loadFromFile("C:/Users/Sergey/Documents/_cpp/playrix/DevTestGame-master/resources/STENCIL.TTF"))
+		throw std::exception("[config error] cannot load fontes from source: /src/");
+
+	return font;
 }
 
 size_t PxConfiguration::boardStartX() const
@@ -64,6 +76,26 @@ size_t PxConfiguration::figureSize() const
 size_t PxConfiguration::figureColorCount() const
 {
 	return configJson.at("figureColorCount");
+}
+
+size_t PxConfiguration::objectiveCount() const
+{
+	return 3;
+}
+
+size_t PxConfiguration::objective(size_t index) const
+{
+	switch(index)
+	{
+	case 0:
+		return configJson.at("objRed");
+	case 1:
+		return configJson.at("objBlue");
+	case 2: 
+		return configJson.at("objGreen");
+	default:
+		return 0;
+	}
 }
 
 const sf::Texture* PxConfiguration::createTextureFromFile(const std::string& path) const

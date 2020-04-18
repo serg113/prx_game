@@ -23,7 +23,8 @@ void GameController::startGame() {
 void GameController::run() 
 {
 	// read configs into a map and pass them to construct configurations
-	mapJson configJson = { { "boardSize",7 }, {"moveCount",5},{"figureColorCount",5} };
+	mapJson configJson = { { "boardSize",7 }, {"moveCount",5}, {"figureColorCount",5},
+							{"objRed", 21}, {"objBlue", 15 }, {"objGreen",  6} };
 
 	PxConfiguration options(configJson);
 

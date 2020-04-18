@@ -5,13 +5,13 @@
 #include <assert.h> 
 
 
-PxMatchGame::PxMatchGame(const PxConfiguration options) : opt(options) { };
+PxMatchGame::PxMatchGame(const PxConfiguration options) : opt(options){ };
 
 InitializedGame* PxMatchGame::init()
 {
-	std::cout << "start to initialize map" << std::endl;
+	this->initGameHeader();
 	this->initGameMap();
-	std::cout << "map initialized" << std::endl;
+	std::cout << "initial game map initialized" << std::endl;
 	return this;
 }
 
@@ -38,6 +38,12 @@ InitializedGame* PxMatchGame::draw(sf::RenderTarget* app)
 				onMatchingThreeXY(indices);
 		}
 	} while (++field != fields.end());
+
+	for (auto header : scores)
+	{
+		app->draw(*header.figure);
+		app->draw(*header.text);
+	}
 	
 	return this;
 }
@@ -84,7 +90,9 @@ void PxMatchGame::initGameMap()
 			{
 				int txtIndex = rd() % opt.figureColorCount();
 
-				field.front = createFront(posX, posY, txtIndex);
+				float offset = (opt.fieldSize() - opt.figureSize()) / 2.f;
+
+				field.front = createFront(posX + offset / 2, posY + offset / 2, txtIndex);
 
 				field.frontIndex = txtIndex;
 
@@ -98,6 +106,28 @@ void PxMatchGame::initGameMap()
 		}
 	}
 }
+
+void PxMatchGame::initGameHeader()
+{
+	for (size_t i = 0; i < opt.objectiveCount(); ++i)
+	{
+		PxScore score;
+		score.figure = createFront(100 + i*(100 + opt.figureSize()), 20 , i);
+		score.figureIndex = i;
+		score.objective = opt.objective(i);
+		score.score = 0;
+
+		sf::Text* tt = new sf::Text();
+		tt->setFont(*opt.font());
+		tt->setString("0/" + std::to_string(opt.objective(i)));
+		tt->setFillColor(sf::Color::Black);
+		tt->setPosition(180 + i * (100 + opt.figureSize()), 20);
+		score.text = tt;
+
+		scores.push_back(score);
+	}
+}
+
 
 void PxMatchGame::dropDown(size_t index)
 {
@@ -259,6 +289,17 @@ void PxMatchGame::onMatchingThreeXY(const std::set<size_t>& indices)
 	for (auto index : indices)
 	{
 		fields[index].isFrontVisible = false;
+		
+		size_t frontIndex = fields[index].frontIndex;
+
+		if (frontIndex < opt.objectiveCount())
+		{
+
+			std::string scoreTxt = std::to_string(++scores[frontIndex].score)
+				+ "/" + std::to_string(scores[frontIndex].objective);
+
+			scores[frontIndex].text->setString(scoreTxt);
+		}
 	}
 }
 
@@ -291,22 +332,20 @@ bool PxMatchGame::fieldIsChecked(size_t index) const
 }
 
 
-sf::Sprite* PxMatchGame::createBack(size_t X, size_t Y, size_t index) const
+sf::Sprite* PxMatchGame::createBack(float X, float Y, size_t index) const
 {
 	sf::Sprite* back = new sf::Sprite(*opt.backgroundTexture(index));
 
-	back->setPosition((float)X, (float)Y);
+	back->setPosition(X, Y);
 
 	return back;
 }
 
-sf::Sprite* PxMatchGame::createFront(size_t X, size_t Y, size_t index) const 
+sf::Sprite* PxMatchGame::createFront(float X, float Y, size_t index) const 
 {
-	float offset = (opt.fieldSize() - opt.figureSize()) / 2.f;
-
 	sf::Sprite* front = new sf::Sprite(*opt.foregroundTexture(index));
 
-	front->setPosition(X + offset / 2, Y + offset / 2);
+	front->setPosition(X, Y);
 
 	return front;
 }

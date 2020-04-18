@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <vector>
+#include <map>
 
 // config comes from server in json format
 // app reads json and constructs board
@@ -24,12 +26,15 @@ public:
 	// check if returned by copy is acceptable
 	const sf::Texture* backgroundTexture(size_t index) const;
 	const sf::Texture* foregroundTexture(size_t index) const;
+	const sf::Font* font() const;
 	size_t boardStartX() const;
 	size_t boardStartY() const;
 	size_t boardSize() const;
 	size_t fieldSize() const;
 	size_t figureSize() const;
 	size_t figureColorCount() const;
+	size_t objectiveCount() const;
+	size_t objective(size_t index) const;
 
 private:
 	const sf::Texture* createTextureFromFile(const std::string& path) const;

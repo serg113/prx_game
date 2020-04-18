@@ -16,6 +16,15 @@ struct PxField
 	const sf::Texture* tempTxt;
 };
 
+struct PxScore
+{
+	sf::Sprite* figure;
+	sf::Text* text;
+	size_t score;
+	size_t objective;
+	int figureIndex;
+};
+
 class UnInitializedGame
 {
 public:
@@ -33,6 +42,7 @@ public:
 private:
 
 	void initGameMap();
+	void initGameHeader();
 	void dropDown(size_t index);
 	void swapAndMatch(size_t lhsIndex, size_t rhsIndex);
 	void swapFigures(size_t lhsIndex, size_t rhsIndex);
@@ -50,8 +60,8 @@ private:
 	void unCheckField(size_t index);
 	bool fieldIsChecked(size_t index) const;
 
-	sf::Sprite* createBack(size_t X, size_t Y, size_t index) const;
-	sf::Sprite* createFront(size_t X, size_t Y, size_t index) const;
+	sf::Sprite* createBack(float X, float Y, size_t index) const;
+	sf::Sprite* createFront(float X, float Y, size_t index) const;
 
 	size_t fieldDistance(size_t lhsIndex, size_t rhsIndex) const;
 	size_t fieldRow(size_t index) const;
@@ -63,6 +73,9 @@ private:
 
 	PxConfiguration opt;
 	std::vector<PxField> fields;
+	std::vector<PxScore> scores;
 
 	size_t currentIndex;
+
+	
 };
