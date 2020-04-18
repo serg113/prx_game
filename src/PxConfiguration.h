@@ -3,16 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
-
-/*
-	Board row/column size. (min 7, max 10)
-	Moves count.
-	Objectives count (max 3) their colors and values. i.e. 10 red, 12 green, 20 blue.
-	Figures colors count. (min 3, max 5)
-
-*/
-
 // config comes from server in json format
+// app reads json and constructs board
 
 //std::string configString = "{"
 //				"boardSize:7,"
@@ -22,9 +14,6 @@
 //			"}";
 
 // issue 1, choose json library to parse config string 
-
-// json comes from server 
-// app reads json and constructs board
 
 typedef std::map<std::string, int> mapJson;
 
