@@ -43,7 +43,11 @@ private:
 
 	void initGameMap();
 	void initGameHeader();
-	void dropDown(size_t index);
+
+	void drawFields(sf::RenderTarget* app);
+	void drawHeader(sf::RenderTarget* app);
+
+	void dropDownFigures(size_t index);
 	void swapAndMatch(size_t lhsIndex, size_t rhsIndex);
 	void swapFigures(size_t lhsIndex, size_t rhsIndex);
 
@@ -52,18 +56,21 @@ private:
 
 	size_t positionToIndex(int x, int y) const;
 	bool indexIsValid(size_t index) const;
+	size_t randomIndexInRange(size_t max) const;
 
 	std::set<size_t> matchThreeXY(size_t index) const;
-	void onMatchingThreeXY(const std::set<size_t>& indices);
+	void actionOnMatchingThreeXY(const std::set<size_t>& indices);
 
 	void checkField(size_t index);
 	void unCheckField(size_t index);
 	bool fieldIsChecked(size_t index) const;
 
+	sf::Text* createText(float X, float Y, const std::string& text) const;
 	sf::Sprite* createBack(float X, float Y, size_t index) const;
 	sf::Sprite* createFront(float X, float Y, size_t index) const;
 
-	size_t fieldDistance(size_t lhsIndex, size_t rhsIndex) const;
+	float frontOffset() const;
+	size_t fieldsDistance(size_t lhsIndex, size_t rhsIndex) const;
 	size_t fieldRow(size_t index) const;
 	size_t fieldColumn(size_t index) const;
 	int addRow(size_t index) const;
